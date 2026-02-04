@@ -522,6 +522,8 @@ El módulo debe contar con las siguientes opciones de búsqueda:
 
 ## 7. Gestión de Equipos
 
+**Propósito**: Gestionar equipos instalados en sedes/inmuebles que requieren mantenimiento preventivo y correctivo.
+
 Sistema que permite gestionar una base de datos completa de equipos con código autogenerado basado en categoría y subcategoría. Incluye información técnica (marca, modelo, serie), ubicación geográfica, integración con códigos QR, información financiera (precio con cálculo automático de IGV), y capacidad de almacenar fotografías. Cuenta con filtros de búsqueda avanzados por todas las variables del equipo.
 
 ### 7.1. Datos Generales del Equipo
@@ -710,6 +712,8 @@ El módulo debe contar con filtros de búsqueda por todas las variables:
 
 ## 8. Gestión de Herramientas
 
+**Propósito**: Gestionar herramientas de trabajo asignadas a técnicos o almacenadas en inventario.
+
 Sistema que permite gestionar una base de datos completa de herramientas, instrumentos y suministros con código autogenerado. Incluye información técnica (marca, serie), asignación a técnicos o almacenes, ubicación geográfica, integración con códigos QR, información financiera (precio con cálculo automático de IGV), y capacidad de almacenar fotografías. Cuenta con filtros de búsqueda avanzados por todas las variables.
 
 ### 8.1. Clasificación de Herramientas
@@ -885,3 +889,723 @@ Filtros de búsqueda por todas las variables:
 - **IGV**: Cálculo automático, no editable manualmente
 - **Código QR**: Debe ser único en el sistema
 - **Cantidad**: Debe ser un valor numérico positivo mayor a cero
+
+## 9. Gestión de Contratos
+
+**Propósito**: Gestionar el ciclo completo de contratos con clientes, desde la solicitud inicial hasta la firma electrónica y envío al cliente, incluyendo revisiones, observaciones y aprobaciones.
+
+Sistema que permite gestionar el flujo de contratos de manera colaborativa entre FM, Cliente, Legal y Gerente General. Incluye carga de documentos, gestión de versiones, registro de observaciones, notificaciones automáticas, firma electrónica y auditoría completa. El sistema maneja dualidad de moneda (S/. y $), tipo de cambio automático desde SUNAT, gestión de IGV y cálculo de FEE.
+
+**IMPORTANTE - Arquitectura de Dos Frentes:**
+
+El módulo de Gestión de Contratos está diseñado con **dos interfaces separadas e independientes**:
+
+1. **Módulo FM (Interno)** - Sección 9.1 a 9.10
+   - Interface administrativa completa para usuarios internos
+   - Roles: Superadministrador, Gerente General, Gerente de FM, Facility Manager, etc.
+   - Gestión completa del ciclo de contratos
+   - Configuración de FEE, IGV, documentos, estados
+   - Auditoría y reportes avanzados
+
+2. **Portal de Clientes (Externo)** - Sección 9.11
+   - Interface exclusiva y simplificada para clientes
+   - Acceso mediante credenciales propias
+   - Vista limitada solo a información del cliente
+   - Funcionalidades específicas: consulta, descarga, carga de contrapropuestas, firma
+   - Dashboard personalizado por cliente
+
+Ambos frentes comparten la misma base de datos pero tienen interfaces, permisos y funcionalidades diferenciadas según el tipo de usuario.
+
+### 9.1. Estados del Contrato
+
+El sistema debe manejar los siguientes estados del contrato:
+
+| Estado | Descripción |
+|--------|-------------|
+| Recibido | Contrato inicial cargado al sistema (primer estado) |
+| En Revisión | FM está revisando el contrato |
+| Con Observaciones | FM registró observaciones al contrato |
+| Observaciones Enviadas | Sistema notificó observaciones al cliente |
+| Contrapropuesta Recibida | Cliente envió contrapropuesta (cargada al sistema) |
+| En Revisión Legal | Contrato enviado a Legal para revisión |
+| Legal con Observaciones | Legal envió observaciones y correcciones |
+| Propuesta Enviada | FM envió 2da propuesta al cliente |
+| Aceptado | Cliente aceptó la propuesta |
+| En Firma | Habilitado para firma electrónica |
+| Firmado | Contrato firmado por todas las partes |
+| Finalizado | Contrato enviado al cliente y archivado |
+
+### 9.2. Datos Generales del Contrato
+
+#### 9.2.1. Código de Contrato
+- Autogenerado por el sistema
+- Formato: CTR-AAAA-NNNN (Ejemplo: CTR-2026-0001)
+- Campo de solo lectura
+- Único en el sistema
+
+#### 9.2.2. Cliente
+- Campo con lista desplegable
+- Vinculado al módulo de Gestión de Clientes
+- Campo obligatorio
+
+#### 9.2.3. Tipo de Cliente
+- Se obtiene automáticamente del cliente seleccionado
+- Opciones: Interno / Externo
+- Determina el cálculo del FEE
+
+#### 9.2.4. Fecha de Solicitud
+- Campo con selector de fecha
+- Fecha en que FM solicita el contrato
+- Se registra automáticamente al crear la solicitud
+
+#### 9.2.5. Fecha de Vigencia
+- Fecha de inicio de vigencia del contrato
+- Campo obligatorio
+
+#### 9.2.6. Fecha de Vencimiento
+- Fecha de fin de vigencia del contrato
+- Campo obligatorio
+
+#### 9.2.7. Moneda
+- Campo con lista desplegable
+- Opciones: Soles (S/.) / Dólares ($)
+- Campo obligatorio
+
+### 9.3. Gestión de Documentos del Contrato
+
+#### 9.3.1. Carga de Contrato Inicial
+- El Gerente de FM debe cargar el contrato recibido del cliente
+- Formatos permitidos: PDF, DOCX
+- Tamaño máximo: 10MB
+- El sistema debe registrar:
+  - Fecha y hora de carga
+  - Usuario que cargó el documento
+  - Versión del documento (se inicia en v1.0)
+
+#### 9.3.2. Versionado de Documentos
+- El sistema debe mantener historial completo de versiones
+- Cada nueva carga incrementa la versión
+- Formato de versión: v1.0, v1.1, v2.0, etc.
+- Se debe permitir descargar versiones anteriores
+- No se pueden eliminar versiones anteriores
+
+#### 9.3.3. Carga de Contrapropuestas
+- Cuando el cliente envía contrapropuesta (por correo), FM debe cargarla al sistema
+- El sistema genera nueva versión automáticamente
+- Se notifica a los usuarios correspondientes
+
+#### 9.3.4. Documentos de Legal
+- Cuando Legal envía observaciones (por correo), FM debe cargarlas al sistema
+- Formatos permitidos: PDF, DOCX
+- Se vincula con el contrato principal
+
+### 9.4. Gestión de Observaciones
+
+#### 9.4.1. Registro de Observaciones por FM
+- FM puede registrar observaciones al contrato
+- Campos:
+  - Descripción de la observación (obligatorio)
+  - Tipo: Modificación / Aclaración / Rechazo
+  - Prioridad: Alta / Media / Baja
+  - Fecha de registro (automático)
+
+#### 9.4.2. Envío de Observaciones
+- FM envía observaciones al cliente desde el sistema
+- El sistema genera notificación automática al cliente
+- Se envía correo electrónico al cliente con las observaciones
+- Estado del contrato cambia a "Observaciones Enviadas"
+
+#### 9.4.3. Observaciones de Legal
+- Legal envía observaciones por correo (proceso manual)
+- FM debe registrar las observaciones de Legal en el sistema
+- Se vinculan con el contrato
+
+### 9.5. Sistema de Notificaciones
+
+#### 9.5.1. Notificaciones Automáticas por Email
+
+El sistema debe enviar notificaciones automáticas por correo electrónico en los siguientes casos:
+
+| Evento | Destinatario | Contenido |
+|--------|--------------|-----------|
+| Contrato cargado al sistema | FM | Notificación de contrato disponible |
+| Observaciones registradas | Gerente de FM | Notificación de observaciones pendientes |
+| Observaciones enviadas al cliente | Cliente | Email con observaciones detalladas |
+| Contrapropuesta cargada | FM | Notificación de nueva versión disponible |
+| Contrato enviado a Legal | Legal | Notificación de contrato para revisión |
+| Propuesta aceptada | Gerente de FM | Notificación de aceptación del cliente |
+| Habilitado para firma | FM | Notificación para gestionar firmas |
+| Contrato firmado | Gerente General | Notificación de contrato firmado |
+
+#### 9.5.2. Notificaciones Internas del Sistema
+
+- El sistema debe mostrar notificaciones internas para los usuarios
+- Panel de notificaciones visible en el dashboard
+- Contador de notificaciones pendientes
+- Historial de notificaciones
+
+### 9.6. Gestión de Firma Electrónica
+
+#### 9.6.1. Habilitación de Firma
+- Cuando el cliente acepta la propuesta (proceso manual), FM actualiza el estado en el sistema
+- El sistema habilita automáticamente la opción de firma electrónica
+- Se notifica a FM para gestionar las firmas
+
+#### 9.6.2. Proceso de Firmas
+- FM gestiona el proceso de firmas electrónicas
+- El sistema debe registrar:
+  - Firmantes requeridos (nombre, cargo, email)
+  - Fecha y hora de cada firma
+  - IP y ubicación de cada firma
+  - Certificado digital de firma
+
+#### 9.6.3. Validación de Firmas
+- Todas las firmas requeridas deben completarse
+- El sistema valida la autenticidad de cada firma
+- Una vez firmado por todas las partes, el estado cambia a "Firmado"
+
+#### 9.6.4. Notificación de Contrato Firmado
+- El sistema notifica automáticamente al Gerente General
+- Se genera versión final del contrato con todas las firmas
+- El documento queda bloqueado para edición
+
+### 9.7. Gestión de Moneda
+
+- El sistema maneja dualidad de moneda (S/. y $)
+- Todos los costos y ventas pueden registrarse en cualquiera de las dos monedas
+- El sistema convierte automáticamente usando el tipo de cambio configurado en el módulo de **Datos Maestros** (Módulo 10)
+- El tipo de cambio usado queda registrado en el contrato
+- En reportes se muestra ambas monedas
+
+### 9.8. Aplicación de IGV
+
+- El sistema calcula automáticamente el IGV en cotizaciones
+- Fórmula: Monto Base × IGV%
+- Total con IGV = Monto Base + IGV
+- El porcentaje de IGV se obtiene del módulo de **Datos Maestros** (Módulo 10)
+
+### 9.9. Gestión y Cálculo del FEE
+
+#### 9.9.1. Configuración del FEE
+- Campo editable solo por **FM** y **Gerente de FM**
+- Se edita durante el proceso de cotización formal
+- Valor expresado en porcentaje (Ejemplo: 15%, 20%)
+- El FEE queda registrado en el contrato
+
+#### 9.9.2. Cálculo del FEE según Tipo de Cliente
+
+**Para Cliente Externo:**
+```
+Precio de Venta = Costo del Servicio / (1 - FEE)
+```
+
+**Ejemplo Cliente Externo:**
+- Costo del Servicio: S/. 1,000
+- FEE: 20% (0.20)
+- Precio de Venta = 1,000 / (1 - 0.20) = 1,000 / 0.80 = S/. 1,250
+
+**Para Cliente Interno:**
+```
+Precio de Venta = Costo del Servicio × (1 + FEE)
+```
+
+**Ejemplo Cliente Interno:**
+- Costo del Servicio: S/. 1,000
+- FEE: 15% (0.15)
+- Precio de Venta = 1,000 × (1 + 0.15) = 1,000 × 1.15 = S/. 1,150
+
+#### 9.9.3. Visualización del FEE
+- El sistema debe mostrar claramente:
+  - Costo del Servicio
+  - FEE aplicado (%)
+  - Cálculo del FEE (monto en moneda)
+  - Precio de Venta Final
+  - IGV
+  - Total con IGV
+
+### 9.10. Flujo del Proceso de Contrato
+
+#### Paso 1: Solicitud de Contrato (Proceso Manual - Fuera del Sistema)
+- **Actor**: FM
+- **Acción**: FM solicita contrato al cliente por correo electrónico o comunicación directa
+- **Sistema**: NO se registra en el sistema. Este paso es completamente manual
+- **Estado**: No aplica (proceso externo al sistema)
+
+#### Paso 2: Inicio del Registro - Inicio del Registro - Recepción de Contrato
+- **Actor**: Cliente
+- **Acción**: Después de la solicitud manual (Paso 1), el cliente tiene dos opciones:
+  - **Opción A (Manual)**: Cliente envía contrato por correo → Gerente de FM crea el registro en el sistema y carga el contrato
+  - **Opción B (Portal)**: Cliente crea el registro y carga el contrato directamente desde el Portal de Clientes
+- **Sistema**: 
+  - El contrato se registra por primera vez en el sistema (independientemente de la opción)
+  - El Gerente de FM o el Cliente ingresan los datos generales del contrato (código, fechas, moneda, etc.)
+  - Se genera el código de contrato automáticamente
+  - Se carga el documento inicial
+- **Notificación**: Sistema notifica a FM y Gerente de FM
+- **Estado**: Recibido (primer estado en el sistema)
+
+#### Paso 3: Revisión y Observaciones
+- **Actor**: FM
+- **Acción**: FM revisa el contrato y registra observaciones en el sistema
+- **Sistema**: FM coloca observaciones en el sistema
+- **Estado**: En Revisión → Con Observaciones
+
+#### Paso 4: Envío de Observaciones al Cliente
+- **Actor**: FM
+- **Acción**: FM envía observaciones desde el sistema
+- **Sistema**: 
+  - Sistema envía email al cliente con las observaciones
+  - Sistema notifica al cliente (email/sistema)
+- **Estado**: Observaciones Enviadas
+
+#### Paso 5: Recepción de Contrapropuesta
+- **Actor**: Cliente
+- **Acción**: Cliente tiene dos opciones:
+  - **Opción A (Manual)**: Cliente envía contrapropuesta por correo → FM carga la contrapropuesta al sistema
+  - **Opción B (Portal)**: Cliente carga la contrapropuesta directamente desde el Portal de Clientes
+- **Sistema**: La contrapropuesta queda registrada en el sistema (independientemente de la opción)
+- **Notificación**: Sistema notifica automáticamente a FM
+- **Estado**: Contrapropuesta Recibida
+
+#### Paso 6: Envío a Legal
+- **Actor**: FM
+- **Acción**: FM envía contrato a Legal (proceso manual - correo)
+- **Sistema**: FM actualiza estado en el sistema
+- **Notificación**: Sistema notifica a Legal
+- **Estado**: En Revisión Legal
+
+#### Paso 7: Observaciones de Legal
+- **Actor**: Legal
+- **Acción**: Legal envía observaciones y correcciones por correo (proceso manual)
+- **Sistema**: FM registra las observaciones de Legal en el sistema
+- **Estado**: Legal con Observaciones
+
+#### Paso 8: Segunda Propuesta
+- **Actor**: FM
+- **Acción**: FM envía 2da propuesta al cliente
+- **Sistema**: FM carga nueva versión del contrato
+- **Notificación**: Sistema notifica al cliente
+- **Estado**: Propuesta Enviada
+
+#### Paso 9: Aceptación del Cliente
+- **Actor**: Cliente
+- **Acción**: Cliente acepta propuesta (proceso manual)
+- **Sistema**: FM actualiza el estado en el sistema
+- **Notificación**: Sistema notifica a Gerente de FM
+- **Estado**: Aceptado
+
+#### Paso 10: Habilitación de Firma Electrónica
+- **Actor**: Sistema
+- **Acción**: Sistema habilita automáticamente opción de firma electrónica
+- **Notificación**: Sistema notifica a FM
+- **Estado**: En Firma
+
+#### Paso 11: Gestión de Firmas
+- **Actor**: FM
+- **Acción**: FM gestiona el proceso de firmas electrónicas
+- **Sistema**: Sistema registra cada firma con validadores del sistema
+- **Estado**: En Firma
+
+#### Paso 12: Contrato Firmado
+- **Actor**: Sistema
+- **Acción**: Sistema valida que todas las firmas estén completadas
+- **Notificación**: Sistema notifica a Gerente General
+- **Estado**: Firmado
+
+#### Paso 13: Envío Final al Cliente
+- **Actor**: FM
+- **Acción**: FM envía contrato firmado al cliente
+- **Sistema**: Sistema archiva el contrato
+- **Estado**: Finalizado
+
+### 9.11. Portal de Clientes - Bandeja de Contratos
+
+**Propósito**: Proporcionar un portal web exclusivo para clientes con interfaz dedicada donde puedan visualizar, consultar y descargar sus contratos, así como responder a observaciones y gestionar el proceso de contrapropuestas de manera autónoma.
+
+**NOTA IMPORTANTE:** Esta es una interfaz completamente separada del módulo administrativo de FM. El portal de clientes debe tener:
+- URL dedicada (Ejemplo: clientes.sistemaFM.com o portal.sistemaFM.com)
+- Diseño y branding diferenciado
+- Login independiente con credenciales de cliente
+- Seguridad reforzada para acceso externo
+- Responsive design para acceso desde móviles y tablets
+
+#### 9.11.1. Acceso al Portal de Clientes
+
+**Autenticación:**
+- El cliente accede mediante URL exclusiva del portal
+- Login con correo electrónico y contraseña
+- Validación con token (5 minutos de vigencia) al crear/restablecer contraseña
+- Opción "Recordar sesión" por 30 días
+- Autenticación de dos factores (opcional, configurable por Gerente FM)
+
+**Permisos:**
+- El rol **Cliente** tiene acceso a su propia bandeja de contratos
+- Cada cliente solo puede ver los contratos asociados a su empresa
+- Los usuarios del cliente pueden ver todos los contratos de su organización
+
+**Acceso:**
+- Menú principal: "Mis Contratos" o "Bandeja de Contratos"
+- Dashboard con resumen de contratos activos, pendientes y finalizados
+
+#### 9.11.2. Vista Principal de la Bandeja
+
+La bandeja debe mostrar una lista de contratos con la siguiente información:
+
+**Columnas Visibles:**
+- Código de Contrato
+- Fecha de Solicitud
+- Estado del Contrato (con indicador visual de color)
+- Fecha de Vigencia
+- Fecha de Vencimiento
+- Moneda (S/. o $)
+- Versión del Documento
+- Acciones Disponibles
+
+**Indicadores Visuales por Estado:**
+- **Solicitado**: Azul (información)
+- **Con Observaciones / Observaciones Enviadas**: Amarillo (atención requerida)
+- **Propuesta Enviada**: Naranja (acción requerida)
+- **Aceptado / En Firma**: Verde claro (en proceso)
+- **Firmado / Finalizado**: Verde (completado)
+
+#### 9.11.3. Funcionalidades Disponibles para el Cliente
+
+**Inicio de Contrato - Carga de Documento Inicial:**
+- El cliente puede iniciar el registro de un nuevo contrato desde su portal
+- Después de recibir la solicitud de FM por correo (proceso manual), el cliente accede al portal
+- Botón "Nuevo Contrato" o "Cargar Contrato"
+- El sistema solicita:
+  - Cliente (autocompletado según el usuario logueado)
+  - Fecha de Vigencia (obligatorio)
+  - Fecha de Vencimiento (obligatorio)
+  - Moneda (S/. o $) (obligatorio)
+  - Documento de contrato inicial (PDF, DOCX, máximo 10MB)
+  - Comentarios o notas adicionales (opcional)
+- Al cargar el contrato inicial, el sistema:
+  - Genera automáticamente el código de contrato (CTR-AAAA-NNNN)
+  - Notifica automáticamente a FM y Gerente de FM
+  - Crea el registro con estado "Recibido"
+  - Genera versión inicial del documento (v1.0)
+  - Registra fecha, hora y usuario que cargó el documento
+
+**Visualización de Contratos:****
+- Ver detalles completos del contrato
+- Descargar versión actual del documento (PDF/DOCX)
+- Descargar versiones anteriores del documento
+- Ver historial de cambios y versiones
+
+**Gestión de Observaciones:**
+- Ver observaciones enviadas por FM
+- Ver observaciones de Legal (cuando aplique)
+- Botón "Descargar Observaciones" para exportar en PDF
+
+**Carga de Contrapropuestas:**
+- Cuando el estado es "Observaciones Enviadas", el cliente puede:
+  - Cargar documento de contrapropuesta
+  - Formatos permitidos: PDF, DOCX
+  - Tamaño máximo: 10MB
+  - Agregar comentarios o notas
+- Al cargar contrapropuesta, el sistema:
+  - Notifica automáticamente a FM
+  - Cambia el estado a "Contrapropuesta Recibida"
+  - Genera nueva versión del documento
+
+**Aceptación de Propuestas:**
+- Cuando el estado es "Propuesta Enviada", el cliente puede:
+  - Botón "Aceptar Propuesta"
+  - Botón "Enviar Observaciones Adicionales"
+- Al aceptar propuesta:
+  - El cliente debe confirmar la aceptación
+  - El sistema cambia el estado a "Aceptado"
+  - Se notifica automáticamente a FM y Gerente General
+
+**Firma Electrónica:**
+- Cuando el estado es "En Firma", el cliente puede:
+  - Acceder al módulo de firma electrónica
+  - Ver representantes habilitados para firmar
+  - Firmar electrónicamente el contrato
+- El sistema valida:
+  - Identidad del firmante
+  - Certificado digital
+  - Registro de IP y ubicación
+
+**Descarga de Contrato Firmado:**
+- Cuando el estado es "Firmado" o "Finalizado":
+  - Descargar contrato con todas las firmas electrónicas
+  - Exportar certificado de firmas
+  - Versión final con sello de "FIRMADO"
+
+#### 9.11.4. Notificaciones para Clientes
+
+El cliente recibe notificaciones automáticas por email y en el sistema en los siguientes casos:
+
+| Evento | Contenido de la Notificación |
+|--------|------------------------------|
+| Contrato cargado por el cliente | "Su contrato [código] ha sido recibido y está en revisión" |
+| Observaciones enviadas por FM | "Tiene observaciones pendientes en contrato [código]" |
+| Propuesta enviada por FM | "Nueva propuesta disponible para contrato [código]" |
+| Contrato habilitado para firma | "Contrato [código] listo para firma electrónica" |
+| Contrato firmado completamente | "Contrato [código] ha sido firmado por todas las partes" |
+| Contrato finalizado | "Contrato [código] ha sido enviado y archivado" |
+
+#### 9.11.5. Panel de Resumen (Dashboard del Cliente)
+
+**Indicadores Principales:**
+- Total de contratos activos
+- Contratos pendientes de acción del cliente
+- Contratos en proceso de firma
+- Contratos firmados este año
+- Próximos vencimientos (contratos que vencen en los próximos 30 días)
+
+**Gráficos Visuales:**
+- Estados de contratos (gráfico de barras o circular)
+- Línea de tiempo de contratos por mes
+- Alertas de contratos por vencer
+
+#### 9.11.6. Filtros de Búsqueda para Clientes
+
+- Búsqueda por Código de Contrato
+- Búsqueda por Estado
+- Búsqueda por Fecha de Solicitud (rango)
+- Búsqueda por Fecha de Vigencia (rango)
+- Búsqueda por Fecha de Vencimiento (rango)
+- Búsqueda por Moneda (S/. / $)
+- Búsqueda por Versión del documento
+- Filtro: "Requieren mi acción" (contratos con observaciones o pendientes de aceptación)
+- Filtro: "Próximos a vencer" (en los próximos 30/60/90 días)
+- Filtros combinados
+
+#### 9.11.7. Validaciones en la Bandeja del Cliente
+
+- El cliente solo puede ver contratos de su propia empresa
+- Solo puede cargar contrapropuestas cuando el estado lo permite
+- Solo puede aceptar propuestas cuando el estado es "Propuesta Enviada"
+- La carga de documentos está limitada a formatos permitidos (PDF, DOCX)
+- Tamaño máximo de archivo: 10MB
+- Solo representantes autorizados pueden firmar electrónicamente
+
+#### 9.11.8. Historial y Trazabilidad para el Cliente
+
+El cliente puede ver:
+- Historial completo del contrato
+- Todas las versiones del documento
+- Fecha y hora de cada acción
+- Usuario que realizó cada acción (tanto del lado del cliente como de FM)
+- Observaciones históricas
+- Registro de notificaciones enviadas
+
+#### 9.11.9. Exportación de Información
+
+El cliente puede exportar:
+- Lista de contratos a Excel/PDF
+- Documento del contrato (cualquier versión)
+- Observaciones en PDF
+- Certificado de firmas electrónicas
+- Reporte de contratos por período
+
+#### 9.11.10. Características Técnicas del Portal de Clientes
+
+**Infraestructura Separada:**
+- URL independiente para el portal (subdominio o dominio propio)
+- Hosting separado del sistema administrativo
+- Base de datos compartida con permisos de solo lectura/escritura limitados
+- API REST para comunicación con el sistema principal
+- Certificado SSL/HTTPS obligatorio para seguridad
+
+**Diseño de Interface:**
+- Diseño responsive (compatible con móviles, tablets y desktop)
+- Branding personalizable según configuración de FM
+- Interface simplificada y amigable para usuarios no técnicos
+- Menú reducido con solo las opciones relevantes para clientes
+- Dashboard visual con gráficos y métricas claras
+ 
+
+### 9.12. Funcionalidades de Búsqueda y Filtros (Módulo FM - Vista Interna)
+
+El módulo debe contar con filtros de búsqueda para roles internos (FM, Gerente FM, etc.):
+
+- Búsqueda por Código de Contrato
+- Búsqueda por Cliente
+- Búsqueda por Estado
+- Búsqueda por Fecha de Solicitud (rango)
+- Búsqueda por Fecha de Vigencia (rango)
+- Búsqueda por Moneda (S/. / $)
+- Búsqueda por Usuario que cargó el documento
+- Búsqueda por Versión del documento
+- Filtros combinados
+
+### 9.13. Auditoría y Trazabilidad
+
+El sistema debe registrar en auditoría:
+
+- Todas las cargas de documentos (quién, cuándo, qué versión)
+- Todos los cambios de estado del contrato
+- Registro de observaciones (autor, fecha, tipo)
+- Envío de notificaciones (destinatario, fecha, contenido)
+- Firmas electrónicas (firmante, fecha, hora, IP, ubicación)
+- Cambios en el FEE (usuario, valor anterior, valor nuevo, fecha)
+- Cambios en el IGV (usuario, valor anterior, valor nuevo, fecha)
+- Consultas de tipo de cambio (fecha, valor obtenido de SUNAT)
+- Acciones del cliente en la bandeja (visualización, descarga, aceptación, carga de documentos)
+- Acceso a la bandeja de contratos (cliente, fecha, hora, IP)
+
+### 9.14. Validaciones del Módulo de Contratos
+
+- **Código de Contrato**: Único en el sistema, generado automáticamente
+- **Documentos**: Solo formatos PDF y DOCX permitidos
+- **Tamaño de archivos**: No exceder 10MB
+- **Campos obligatorios**: Cliente, Fecha de Vigencia, Fecha de Vencimiento, Moneda
+- **FEE**: Debe ser un valor numérico entre 0% y 100%
+- **IGV**: Solo editable por Gerente de FM (configurado en Datos Maestros)
+- **Estados**: Solo pueden cambiar siguiendo el flujo establecido
+- **Firmas**: Todas las firmas requeridas deben estar completas antes de marcar como "Firmado"
+- **Tipo de Cambio**: Debe actualizarse diariamente desde SUNAT (configurado en Datos Maestros)
+
+## 10. Datos Maestros del Sistema
+
+**Propósito**: Centralizar la configuración de parámetros maestros del sistema que son utilizados de manera transversal en todos los módulos. Este módulo permite mantener la información base actualizada y garantiza la consistencia de datos en todo el sistema.
+
+### 10.1. Tipo de Cambio (SUNAT)
+
+Gestionar el tipo de cambio oficial del dólar estadounidense (USD) respecto al sol peruano (PEN), obtenido automáticamente desde SUNAT para ser utilizado en todas las transacciones del sistema.
+
+#### 10.1.1. Actualización Automática del Tipo de Cambio
+
+**Proceso Automático:**
+- El sistema debe extraer el tipo de cambio desde la API de SUNAT diariamente
+- Valor del Dólar ($) por cada unidad de Sol (S/.)
+- Proceso automático ejecutado a las 00:00 hrs (medianoche)
+- En caso de error en la consulta, el sistema debe:
+  - Reintentar la consulta cada hora hasta obtener respuesta
+  - Notificar al Superadministrador si no se obtiene respuesta en 24 horas
+  - Utilizar el último tipo de cambio registrado hasta obtener actualización
+
+**Campos del Registro:**
+- **Fecha**: Fecha del tipo de cambio (automático)
+- **Tipo de Cambio Compra**: Valor de compra del dólar (automático desde SUNAT)
+- **Tipo de Cambio Venta**: Valor de venta del dólar (automático desde SUNAT)
+- **Fuente**: SUNAT (automático)
+- **Fecha y Hora de Actualización**: Timestamp de la última actualización (automático)
+- **Estado**: Activo / Inactivo
+
+#### 10.1.2. Consulta Manual del Tipo de Cambio
+
+**Permisos:**
+- Solo el **Superadministrador** puede ejecutar consulta manual
+
+**Funcionalidad:**
+- Botón "Consultar SUNAT" disponible en la pantalla de configuración
+- Al presionar, el sistema consulta inmediatamente el tipo de cambio actual
+- El sistema actualiza la tabla con el nuevo valor
+- Se registra en auditoría la consulta manual (usuario, fecha, hora)
+
+#### 10.1.3. Historial de Tipos de Cambio
+
+**Registro Histórico:**
+- El sistema debe mantener historial completo de todos los tipos de cambio
+- No se pueden eliminar registros históricos
+- Se debe poder consultar el tipo de cambio de cualquier fecha pasada
+- Útil para auditorías y recálculos
+
+**Campos de Búsqueda:**
+- Búsqueda por fecha (rango)
+- Búsqueda por mes/año
+- Exportación del historial a Excel
+
+#### 10.1.4. Aplicación del Tipo de Cambio en el Sistema
+
+**Uso Transversal:**
+- El tipo de cambio se utiliza en todos los módulos que manejan valores monetarios:
+  - Gestión de Equipos (precio con IGV)
+  - Gestión de Herramientas (precio con IGV)
+  - Gestión de Contratos (costos, FEE, totales)
+  - Cotizaciones
+  - Órdenes de Servicio
+  - Reportes financieros
+
+**Reglas de Aplicación:**
+- Para conversiones de Soles a Dólares: se usa el **Tipo de Cambio Venta**
+- Para conversiones de Dólares a Soles: se usa el **Tipo de Cambio Compra**
+- El tipo de cambio usado en una transacción queda registrado en el documento
+- Los documentos mantienen el tipo de cambio del día de su creación
+
+#### 10.1.5. Validaciones y Alertas
+
+**Validaciones:**
+- El tipo de cambio debe ser un valor numérico positivo mayor a cero
+- Compra debe ser menor o igual a Venta
+- El sistema debe validar variaciones extremas (ej: más de 10% de diferencia con el día anterior)
+
+**Alertas:**
+- Si el tipo de cambio varía más del 5% respecto al día anterior, notificar a:
+  - Gerente de FM
+  - Gerente General
+- Si no se actualiza por más de 48 horas, notificar a Superadministrador
+
+### 10.2. Gestión de IGV (Impuesto General a las Ventas)
+
+**Propósito**: Centralizar la configuración del porcentaje de IGV aplicable a todas las transacciones del sistema, permitiendo su actualización cuando existan cambios en la legislación tributaria.
+
+#### 10.2.1. Configuración del IGV
+
+**Parámetros:**
+- **Porcentaje de IGV**: Campo numérico decimal
+- **Valor por Defecto**: 18% (0.18)
+- **Fecha de Vigencia**: Fecha desde la cual aplica el porcentaje
+- **Estado**: Activo / Inactivo
+- **Observaciones**: Campo de texto libre para justificar cambios
+
+**Permisos de Edición:**
+- Solo editable por el rol **Gerente de FM**
+- El Superadministrador puede ver pero no editar (para mantener trazabilidad)
+
+#### 10.2.2. Proceso de Modificación del IGV
+
+**Flujo de Cambio:**
+1. El **Gerente de FM** accede al módulo de Datos Maestros
+2. Selecciona la opción "Modificar IGV"
+3. El sistema muestra el valor actual y solicita:
+   - Nuevo porcentaje de IGV
+   - Fecha de vigencia del cambio
+   - Observaciones (obligatorio)
+
+**Importante:**
+- El cambio de IGV NO afecta documentos ya creados
+- Los documentos nuevos utilizarán el IGV vigente a su fecha de creación
+- Se mantiene historial completo de cambios de IGV
+
+
+#### 10.2.4. Aplicación del IGV en el Sistema
+
+**Uso Transversal:**
+- El IGV se aplica automáticamente en:
+  - Gestión de Equipos (cálculo de precio con IGV)
+  - Gestión de Herramientas (cálculo de precio con IGV)
+  - Gestión de Contratos (cotizaciones, totales)
+  - Órdenes de Servicio
+  - Facturación
+  - Reportes financieros
+
+**Fórmulas de Cálculo:**
+- **IGV = Monto Base × Porcentaje IGV**
+- **Total con IGV = Monto Base + IGV**
+- **Monto Base desde Total = Total con IGV / (1 + Porcentaje IGV)**
+
+**Reglas de Aplicación:**
+- El IGV se calcula automáticamente en todos los campos de precio
+- El usuario ve tanto el precio sin IGV como el precio con IGV
+- El IGV usado en una transacción queda registrado en el documento
+- Los documentos mantienen el IGV vigente al momento de su creación
+:
+
+**Posibles Adiciones Futuras:**
+- Catálogo de Departamentos/Provincias/Distritos
+- Catálogo de Países
+- Catálogo de Zonas Geográficas
+- Días festivos y no laborables
+- Horarios de operación
+- Tarifas y costos estándar
+- Categorías de equipos y subcategorías
+- Tipos de mantenimiento
+- Plantillas de documentos
+- Configuración de firma electrónica
