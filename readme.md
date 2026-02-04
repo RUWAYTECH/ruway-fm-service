@@ -235,6 +235,276 @@ El módulo debe contar con las siguientes opciones de búsqueda:
 - Búsqueda por ubicación
 - Filtros combinados
 
+### 4.9. Proceso de Registro de Cliente Nuevo
+
+**Propósito**: Gestionar el flujo completo de registro de información de clientes nuevos, desde la solicitud de datos hasta el envío de la bienvenida, incluyendo validación de historial crediticio para clientes externos.
+
+Este proceso involucra la colaboración entre FM, Cliente, Service Desk y opcionalmente CVC (Central de Verificación Crediticia) para clientes externos nuevos.
+
+#### 4.9.1. Flujo del Proceso de Registro
+
+**Paso 1: Solicitud de Datos (Proceso Manual)**
+- **Actor**: FM
+- **Acción**: FM envía solicitud de data de usuarios a registrar al cliente
+- **Medio**: Correo electrónico
+- **Sistema**: NO se registra en el sistema. Proceso completamente manual
+- **Contenido de la Solicitud**: Formato Excel con campos requeridos
+
+**Paso 2: Cliente Envía la Data Solicitada (Proceso Manual)**
+- **Actor**: Cliente
+- **Acción**: Cliente envía la data solicitada
+- **Medio**: Correo electrónico
+- **Formato**: Excel (plantilla enviada por FM)
+- **Contenido**: Datos completos del cliente según formato estándar
+
+**Paso 2.1: Validación de Historial Crediticio (Solo para Clientes Externos Nuevos)**
+- **Actor**: FM
+- **Acción**: Para clientes externos nuevos, FM solicita validación de historial crediticio a CVC
+- **Proceso**: Manual, fuera del sistema
+- **Información Enviada**: Datos del cliente en formato Excel
+- **Propósito**: Verificar la solvencia crediticia del cliente antes de registrarlo
+
+**Paso 3: Derivación de Data a Service Desk**
+- **Actor**: FM
+- **Acción**: FM deriva la data recibida del cliente a Service Desk
+- **Medio**: Correo electrónico o comunicación interna
+- **Sistema**: NO se registra en el sistema
+
+**Paso 4: Service Desk Ingresa al Sistema**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk accede al módulo de Gestión de Clientes
+- **Sistema**: Service Desk inicia sesión en el sistema FM
+
+**Paso 5: Opción de Crear Cliente**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk selecciona la opción "Crear Cliente" o "Nuevo Cliente"
+- **Sistema**: Sistema muestra el formulario de registro de cliente
+
+**Paso 6: Service Desk Ingresa el RUC en la Barra de Búsqueda**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk ingresa el RUC del cliente en la barra de búsqueda
+- **Sistema**: Sistema busca si el RUC ya existe en la base de datos
+- **Propósito**: Validar si el cliente ya está registrado para evitar duplicados
+
+**Paso 7: Service Desk Verifica la Data del Cliente**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk verifica la información del cliente
+- **Sistema**: Sistema muestra los resultados de la búsqueda
+
+**Decisión: ¿Cliente Existe?**
+
+**Caso A: Cliente NO Existe**
+- **Sistema**: No se encuentra ningún registro con ese RUC
+- **Siguiente Paso**: Ir a **Paso 10 - Registrar al Cliente**
+
+**Caso B: Cliente SÍ Existe**
+- **Sistema**: Se encuentra un registro existente con ese RUC
+- **Siguiente Paso**: Ir a **Paso 8 - Verificar si la Data es la Misma**
+
+**Paso 8: Decisión - ¿Misma Data?**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk compara la data recibida con la data existente en el sistema
+- **Opciones**:
+  - **SÍ - La data es la misma**: Ir a **Paso 9 - Enviar Correo de Bienvenida**
+  - **NO - La data es diferente**: Actualizar la data del cliente
+
+**Paso 8.1: Service Desk Actualiza la Data (Si la data NO es la misma)**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk actualiza los campos modificados del cliente
+- **Sistema**: 
+  - Sistema registra los cambios en auditoría
+  - Guarda la nueva información
+  - Registra usuario y fecha de actualización
+- **Siguiente Paso**: Ir a **Paso 9 - Enviar Correo de Bienvenida**
+
+**Paso 9: Service Desk Envía Correo de Bienvenida**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk envía correo de bienvenida al cliente
+- **Sistema**: Puede ser manual o mediante el sistema
+- **Asunto del Correo**: "Bienvenido a Ruwaytech"
+- **Siguiente Paso**: Ir a **Paso 11 - Sistema Envía Correo a Cliente**
+
+**Paso 10: Service Desk Registra al Cliente (Si el cliente NO existe)**
+- **Actor**: Service Desk FM
+- **Acción**: Service Desk completa todos los campos del formulario de registro
+- **Sistema**: 
+  - Sistema genera automáticamente el Código de Cliente (RUC-CECO)
+  - Valida que todos los campos obligatorios estén completos
+  - Registra el nuevo cliente en la base de datos
+  - Genera log de auditoría con usuario y fecha de creación
+- **Datos a Registrar**:
+  - RUC
+  - Razón Social
+  - Domicilio Fiscal
+  - CECO
+  - Tipo de Cliente (Público/Privado)
+  - Clasificación (Interno/Externo)
+  - Nacional/Extranjero
+  - País
+  - Email
+  - Teléfono
+  - WhatsApp
+  - Representantes
+  - Usuarios
+  - Sucursales
+
+**Paso 11: Sistema Envía Correo a Cliente (Proceso Automático)**
+- **Actor**: Sistema
+- **Acción**: Sistema envía automáticamente correo de bienvenida al cliente
+- **Asunto**: "Bienvenido a Ruwaytech"
+- **Destinatario**: Email del cliente registrado
+- **Contenido**: 
+  - Mensaje de bienvenida
+  - Código de cliente generado
+  - Instrucciones de acceso al portal (si aplica)
+  - Información de contacto de FM
+- **Fin del Proceso**
+
+#### 4.9.2. Validación de Historial Crediticio (Clientes Externos Nuevos)
+
+**Propósito**: Para clientes externos nuevos, es necesario validar su historial crediticio antes de proceder con el registro.
+
+**Proceso:**
+1. FM identifica que el cliente es externo y nuevo
+2. FM solicita validación de historial crediticio a CVC (Central de Verificación Crediticia)
+3. FM envía data del cliente en formato Excel
+4. CVC realiza la validación (proceso externo)
+5. CVC devuelve resultado a FM
+6. Si la validación es exitosa, FM procede con el Paso 3 (derivar a Service Desk)
+7. Si la validación falla, FM notifica al cliente y no procede con el registro
+
+**Importante**: Este paso solo aplica para **clientes externos nuevos**.
+
+#### 4.9.3. Formato de Data de Cliente
+
+**Plantilla Excel para Solicitud de Datos:**
+
+El formato Excel debe incluir las siguientes columnas:
+
+| Campo | Descripción | Obligatorio |
+|-------|-------------|-------------|
+| RUC | Registro Único de Contribuyentes (11 dígitos) | Sí |
+| Razón Social | Nombre completo o razón social del cliente | Sí |
+| Domicilio Fiscal | Dirección completa del domicilio fiscal | Sí |
+| CECO | Centro de Costos | Sí |
+| Tipo de Cliente | Público o Privado | Sí |
+| Clasificación | Interno o Externo | Sí |
+| Nacional/Extranjero | Nacional o Extranjero | Sí |
+| País | País del cliente | Sí |
+| Email | Correo electrónico corporativo | Sí |
+| Teléfono | Número de contacto principal | Sí |
+| WhatsApp | Número de WhatsApp | No |
+| Nombre Representante | Nombre del representante legal | Sí |
+| Email Representante | Email del representante | Sí |
+| Celular Representante | Celular del representante | Sí |
+| Cargo Representante | Cargo del representante | Sí |
+
+**Nota**: La plantilla puede incluir múltiples representantes y usuarios según la estructura del cliente.
+
+#### 4.9.4. Roles Involucrados en el Proceso
+
+| Rol | Responsabilidad |
+|-----|-----------------|
+| **FM (Facility Manager)** | Solicitar datos al cliente, coordinar validación crediticia (si aplica), derivar data a Service Desk |
+| **Cliente** | Proporcionar información completa en formato Excel |
+| **CVC (Central Verificación Crediticia)** | Validar historial crediticio para clientes externos nuevos |
+| **Service Desk FM** | Ingresar o actualizar data en el sistema, enviar correo de bienvenida |
+| **Sistema** | Validar datos, generar código de cliente, enviar correo automático de bienvenida |
+
+#### 4.9.5. Correo de Bienvenida
+
+**Asunto**: "Bienvenida e Instrucciones de Acceso"
+
+**Estructura del Correo**:
+
+```
+Estimado(a) [Nombre del Usuario],
+
+Le damos la cordial bienvenida a [Panorama BPO]. A partir de este momento, usted cuenta con un acceso institucional para el uso de la plataforma.
+
+Por favor, siga las indicaciones a continuación para activar su cuenta:
+
+Credenciales Iniciales de Acceso
+• Correo institucional: [correo@cliente.pe]
+• Contraseña temporal: [contraseña generada automáticamente]
+
+Al ingresar por primera vez se le solicitará cambiar su contraseña. Para ello, recibirá un código de verificación en su correo institucional, el cual deberá ingresar para completar el proceso de actualización de credenciales.
+
+Importante:
+• El cambio de contraseña debe realizarse dentro de un plazo máximo de 24 horas desde el envío del correo.
+• Si el plazo vence sin haber realizado el cambio, el sistema generará automáticamente una nueva opción para restablecer la contraseña.
+
+En caso de presentar alguna dificultad con el acceso, por favor comuníquese con el área de soporte a través de:
+Correo: soportefm@panoramabpo.com
+
+Agradecemos su atención y le deseamos un excelente inicio.
+
+Atentamente,
+[Nombre / Cargo]
+[Nombre de la Empresa]
+```
+
+**Campos Dinámicos del Correo**:
+- **[Nombre del Usuario]**: Nombre completo del usuario registrado
+- **[Panorama BPO]**: Nombre de la empresa (configurable en parámetros del sistema)
+- **[correo@cliente.pe]**: Correo institucional asignado al usuario
+- **[contraseña generada automáticamente]**: Contraseña temporal generada por el sistema
+- **[Nombre / Cargo]**: Nombre y cargo del remitente (configurable)
+- **[Nombre de la Empresa]**: Nombre de la empresa remitente
+
+**Reglas del Sistema para Contraseñas Temporales**:
+
+1. **Generación Automática**: El sistema debe generar una contraseña temporal aleatoria y segura
+2. **Formato de Contraseña**: Debe incluir mayúsculas, minúsculas y números (mínimo 8 caracteres)
+3. **Código de Verificación**: Al cambiar la contraseña, el sistema envía un código de verificación al correo institucional
+4. **Plazo de 24 Horas**: El usuario tiene 24 horas para cambiar la contraseña temporal
+5. **Vencimiento**: Si no cambia la contraseña en 24 horas:
+   - La contraseña temporal se invalida
+   - El sistema genera automáticamente una opción de restablecimiento
+   - El usuario debe solicitar un nuevo código de acceso
+
+**Envío del Correo**:
+- **Automático**: El sistema envía el correo automáticamente después del registro exitoso del cliente
+- **Manual**: Service Desk también puede enviar el correo manualmente desde el sistema
+- **Registro**: El sistema debe registrar en auditoría la fecha y hora de envío del correo
+
+**Información de Soporte**:
+- **Correo de Soporte**: soportefm@panoramabpo.com (parametrizable en el sistema)
+- **Disponibilidad**: Debe especificarse en el correo el horario de atención
+
+#### 4.9.6. Validaciones del Proceso de Registro
+
+- **RUC Único**: El sistema debe validar que no exista un RUC duplicado antes de permitir el registro
+- **Campos Obligatorios**: Todos los campos marcados como obligatorios deben estar completos
+- **Formato de Email**: Validar formato correcto de correo electrónico
+- **Formato de RUC**: Validar que sea un RUC válido de 11 dígitos
+- **Historial Crediticio**: Para clientes externos nuevos, debe existir validación de CVC antes del registro
+- **Actualización de Data**: Si el cliente ya existe, se debe actualizar solo los campos modificados
+
+#### 4.9.7. Auditoría del Proceso
+
+El sistema debe registrar en auditoría:
+
+- Fecha y hora de creación del cliente
+- Usuario (Service Desk) que registró al cliente
+- Fecha y hora de actualizaciones de data
+- Usuario que realizó las actualizaciones
+- Cambios específicos realizados (valor anterior y nuevo valor)
+- Envío de correo de bienvenida (fecha, hora, destinatario)
+- Búsquedas de RUC realizadas
+
+#### 4.9.8. Notificaciones del Proceso
+
+**Notificaciones Automáticas**:
+1. **Al Cliente**: Correo de bienvenida con código de cliente
+2. **A FM**: Notificación de cliente registrado exitosamente
+3. **A Gerente de FM**: Resumen semanal de nuevos clientes registrados
+
+**Notificaciones Manuales**:
+1. FM notifica al cliente sobre solicitud de datos (correo)
+2. FM notifica a CVC para validación crediticia (correo)
+3. FM notifica a Service Desk para proceder con el registro (correo o comunicación interna)
+
 ## 5. Modulo de gestion integral de inmuebles
 
 El módulo de gestión de inmuebles permite registrar y administrar las sedes o inmuebles asociados a los clientes. Cada inmueble puede estar vinculado a un cliente específico.
