@@ -60,6 +60,29 @@ c. El super administrador ingresa la data del usuario todos los campos son oblig
    - Correo corporativo
    - Celular
 
+### 3.1. Gestión de Contraseñas de Usuarios
+
+**Importante**: Los datos y contraseñas de usuarios deben actualizarse cada 3 meses.
+
+**Proceso de Actualización de Contraseña**:
+1. **Alerta Automática**: Sistema genera alerta automática 7 días antes del vencimiento de la contraseña
+2. **Notificación al Usuario**: Usuario recibe notificación por correo electrónico para actualizar contraseña
+3. **Bloqueo por Vencimiento**: Si el usuario no actualiza la contraseña en el plazo establecido, el sistema bloquea automáticamente el acceso
+4. **Solicitud de Restablecimiento**: Usuario bloqueado debe solicitar restablecimiento de contraseña al Service Desk FM
+5. **Restablecimiento Manual**: Service Desk FM puede restablecer manualmente la contraseña del usuario
+
+**Validaciones**:
+- La nueva contraseña debe ser diferente a las últimas 3 contraseñas utilizadas
+- Debe contener al menos 8 caracteres
+- Debe incluir mayúsculas, minúsculas, números y caracteres especiales
+- El sistema registra en auditoría todos los cambios de contraseña
+
+**Auditoría**:
+- Fecha y hora de cambio de contraseña
+- Usuario que realizó el cambio
+- Tipo de cambio (manual, automático, restablecimiento)
+- Estado anterior y nuevo estado
+
 ## 4. Módulo de Gestión de Clientes
 
 Sistema que permite al Superadministrador registrar y administrar clientes con código autogenerado (RUC-CECO). Incluye datos básicos (RUC, razón social, domicilio fiscal, CECO), clasificación (público/privado, interno/externo, nacional/extranjero), y permite registrar múltiples representantes, usuarios y sucursales por cliente. Cuenta con listas desplegables con búsqueda, validación de RUC único, y capacidad de crear clientes sin salir de la ventana actual. Todas las acciones quedan registradas en auditoría.
@@ -1879,3 +1902,832 @@ Gestionar el tipo de cambio oficial del dólar estadounidense (USD) respecto al 
 - Tipos de mantenimiento
 - Plantillas de documentos
 - Configuración de firma electrónica
+
+## 11. Solicitud de Atención de Incidencia
+
+**Propósito**: Gestionar el registro y seguimiento de solicitudes de atención para mantenimiento de instalaciones, reparaciones, emergencias y suministros, permitiendo a los usuarios reportar incidencias con descripción detallada, imágenes y categorización automática según criticidad.
+
+Sistema que permite a los usuarios (clientes internos/externos) crear solicitudes de atención de incidencias de manera estructurada mediante categorías jerárquicas de mantenimiento, incluyendo carga de imágenes, descripción del problema, y asignación automática a equipos de FM según nivel de urgencia. El sistema genera tickets de servicio y notifica al personal correspondiente.
+
+**Frecuencia de Actualización**: Los datos y contraseñas de usuarios deben actualizarse cada 3 meses.
+
+### 11.1. Tipos de Solicitud
+
+El sistema maneja dos tipos principales de solicitudes:
+
+| Tipo de Solicitud | Descripción |
+|-------------------|-------------|
+| **Mantenimiento** | Instalaciones, reparaciones, emergencias |
+| **Suministros** | Útiles, materiales, consumibles |
+
+**Campo**: Lista desplegable obligatoria
+
+### 11.2. Estructura de Categorización Jerárquica
+
+
+**A NIVEL DE INTERFAZ VISUAL**: El usuario interactúa ÚNICAMENTE con **2 listas desplegables**:
+
+✅ **CATEGORIA** (Nivel 1) - Campo visible y seleccionable
+✅ **UNIDAD DE MTTO** (Nivel 2) - Campo visible y seleccionable
+
+❌ **SUB UNIDAD DE MTTO** (Nivel 3) - NO visible para el usuario
+
+**Catálogo Completo de Información**:
+El catálogo maestro de 3 niveles (ver sección 11.2.1) se mantiene completo para propósitos de administración, reportes y referencia técnica, pero **el usuario final solo ve y selecciona 2 niveles**.
+
+**Funcionamiento Visual de la Interfaz**:
+1. El usuario ve y selecciona la **CATEGORIA** desde una lista desplegable (ej: ÁREAS VERDES, CERRAJERÍA, HVAC)
+2. El sistema filtra automáticamente y muestra solo las **UNIDADES DE MTTO** correspondientes a la categoría seleccionada
+3. El usuario ve y selecciona la **UNIDAD DE MTTO** desde la segunda lista desplegable (ej: JARDINERÍA, CARPINTERÍA ALUMINIO)
+4. La solicitud queda registrada con estos 2 niveles de categorización
+5. El **tercer nivel (SUB UNIDAD DE MTTO)** existe en el catálogo pero NO aparece en ninguna pantalla del usuario
+
+**Nota para el Equipo de Desarrollo**: Implementar solo 2 componentes de selección (dropdowns) en cascada. El nivel 3 del catálogo es solo para consulta del administrador.
+
+#### 11.2.1. Catálogo Completo de Categorías de Mantenimiento
+
+**1. ÁREAS VERDES**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| ÁREAS VERDES | JARDINERÍA | JARDINERA |
+| | | MACETEROS |
+| | | PLANTAS ORNAMENTALES |
+| | | GRASS Y OTROS |
+| | | PLANTAS ESPECIALES |
+| | MACETEROS | GRASS Y OTROS |
+
+**2. CERRAJERÍA**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| CERRAJERÍA | CARPINTERÍA ALUMINIO | MAMPARAS - GUÍAS |
+| | | PUERTAS - CIERRA PUERTAS |
+| | | VENTANAS - GUÍAS |
+| | CARPINTERÍA DE MADERA | DIVISIONES - MAMPARAS |
+| | | PUERTAS - BISAGRAS |
+| | | PUERTAS - CHAPAS Y/O CERRADURAS |
+| | | PUERTAS - CIERRA PUERTAS |
+| | | PUERTAS - ESTRUCTURAS |
+| | | PUERTAS - FRENOS DE PISO |
+| | | PUERTAS - MANIJAS Y/O TIRADORES |
+| | | VENTANAS - SELLADO |
+| | CARPINTERÍA METÁLICA | BUZONES - TAPAS DE FIERRO |
+| | | PASAMANOS - PINTURA |
+| | | PORTONES/PUERTAS - BISAGRAS |
+| | | PUERTAS - BRAZOS HIDRÁULICOS |
+| | | PUERTAS - CERROJOS |
+| | | PUERTAS - CHAPAS Y/O CERRADURAS |
+| | | PUERTAS - CIERRA PUERTAS HIDRÁULICOS |
+| | | PUERTAS - DUPLICADO DE LLAVES |
+| | | PUERTAS - ESTRUCTURAS |
+| | | PUERTAS - MANIJAS Y/O TIRADORES |
+| | | PUERTAS - TOPES |
+| | | PUERTAS ENROLLABLES - ESTRUCTURA |
+| | | PUERTAS ENROLLABLES - SISTEMA DE APERTURA ELÉCTRICO |
+| | | PUERTAS ENROLLABLES - SISTEMA DE APERTURA MANUAL |
+| | | VENTANAS - ESTRUCTURAS |
+| | | VENTANAS - GUÍAS |
+| | | VENTANAS - MANIJAS Y/O TIRADORES |
+
+**3. DACI (Detección Alarma Contra Incendios)**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| DACI | EQUIPOS DE DETECCIÓN DE INCENDIOS | DETECCIÓN DE INCENDIOS - DETECTORES DE ANIEGO |
+| | | DETECTORES DE HUMO |
+| | | ESTACIÓN MANUAL |
+| | | FOTOBEEN |
+| | | PANELES CONTRA INCENDIO |
+| | | ROCIADORES |
+| | EQUIPOS DE ELEVACIÓN | ASCENSORES - BOTONERAS |
+| | | CABINA - PISOS |
+| | | ILUMINACIÓN - LUMINARIAS |
+| | | MOTOR - REPARACIÓN |
+| | | PISO DE CABINA - NIVELACIÓN |
+| | | PROGRAMACIÓN - TARJETAS |
+| | | PUERTAS - RIELES |
+| | | SISTEMA DE EXTRACCIÓN - EXTRACTOR DE AIRE |
+| | | SISTEMA ELÉCTRICO - TARJETA |
+| | | TABLERO - LLAVES, ITMs |
+
+**4. EQUIPOS DE RESPALDO**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| EQUIPOS DE RESPALDO | GENERADORES | GRUPOS ELECTRÓGENOS - GE FIJOS |
+| | | GRUPOS ELECTRÓGENOS - GE PORTÁTILES |
+| | SISTEMAS REDUNDANTES | SUBESTACIÓN - CELDAS |
+| | UPS | UPS - BATERÍAS |
+| | | UPS - TARJETAS |
+
+**5. EQUIPOS ELECTROMECÁNICOS**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| EQUIPOS ELECTROMECÁNICOS | SISTEMA DE BOMBEO | EQUIPOS DE BOMBEO - BOMBAS SUMERGIBLES |
+| | | EQUIPOS DE BOMBEO - ELECTROBOMBAS |
+| | | EQUIPOS DE BOMBEO - MOTOBOMBAS |
+| | | SISTEMA DE CONTROL - SENSORES, COMPONENTES DEL SISTEMA |
+| | SISTEMAS DE IMPULSIÓN | SISTEMA DE PRESIÓN CONSTANTE |
+| | | TANQUE HIDRONEUMÁTICO |
+
+**6. EQUIPOS MENORES**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| EQUIPOS MENORES | EQUIPOS DE SASTRERÍA | EQUIPOS DE COSTURA - BASTERAS |
+| | | EQUIPOS DE COSTURA - MÁQUINAS DE COSER |
+| | | EQUIPOS DE PLANCHADO DE PRENDAS - PLANCHAS |
+| | | EQUIPOS DE PLANCHADO DE PRENDAS - VAPORIZADORES |
+| | SEGURIDAD DE INSTALACIONES | EQUIPOS DE SEGURIDAD - ANTENAS DE SEGURIDAD |
+| | | SENSORES DE PRENDAS - PIOCHAS Y PINES |
+
+**7. HVAC (Heating, Ventilation, and Air Conditioning)**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| HVAC | AIRE ACONDICIONADO | CHILLERS - CONDENSADORES |
+| | | DUCTOS Y TUBERÍAS |
+| | | FAN COIL - FILTROS |
+| | | SPLIT - INTERCAMBIADOR |
+| | | TERMOSTATOS - DIGITALES/ANALÓGICOS |
+| | EQUIPOS DE EXTRACCIÓN DE AIRE | EXTRACTORES DE AIRE - CAMPANA EXTRACTORA |
+| | | EXTRACTORES DE AIRE - CONDUCTOS O DUCTOS |
+| | | EXTRACTORES DE AIRE - FILTRO PURIFICADOR |
+| | | EXTRACTORES DE AIRE - VENTILADOR |
+| | EQUIPOS DE PRECISIÓN | CONDENSADOR - COMPRESOR |
+| | EQUIPOS DE VENTILACIÓN | VENTILADORES - VENTILADORES DE PARED |
+| | | VENTILADORES - VENTILADORES DE TECHO |
+
+**8. INFRAESTRUCTURA**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| INFRAESTRUCTURA | INFRAESTRUCTURA | ALFOMBRAS |
+| | | PISO TÉCNICO |
+| | | ESTRUCTURAS - COLUMNAS Y VIGAS |
+| | | ESTRUCTURAS - MUROS Y TABIQUES |
+| | | FACHADAS - ALUCOBOND |
+| | | FACHADAS - LIMPIEZA FACHADA |
+| | | FACHADAS - VIDRIOS TEMPLADOS |
+| | | FALSO CIELO RASO - ACCESORIOS |
+| | | FALSO CIELO RASO - BALDOSAS |
+| | | IMPERMEABILIZACIÓN DE TECHOS - IMPERMEABILIZANTES/EPÓXICOS |
+| | | MUROS - ENLUCIDO DE MUROS |
+| | | PINTURA - PINTURA LÁTEX |
+| | | PISOS - CERÁMICO/PORCELANATO |
+| | | TECHOS/COBERTURAS - DRENAJES |
+| | | TECHOS/COBERTURAS - ESTRUCTURAS |
+| | | TECHOS/COBERTURAS - TEJAS |
+| | | TECHOS/COBERTURAS - TR4 |
+
+**9. MOBILIARIO**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| MOBILIARIO | MOBILIARIO | CERRAJERÍA - LLAVES |
+| | | ESCRITORIOS - DE MADERA |
+| | | ESCRITORIOS - DE MELAMINA |
+| | | ESCRITORIOS - METÁLICOS |
+| | | MUEBLES - SILLONES Y AFINES |
+| | | ORGANIZADORES - LOCKERS |
+| | | SILLAS - OTRAS SILLAS |
+| | | SILLAS - SILLAS DE OFICINA |
+
+**10. SACI (Sistema Automático Contra Incendios)**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| SACI | EQUIPOS DE EXTINCIÓN | EXTINTORES - MANGUERA |
+| | | EXTINTORES - MANÓMETRO |
+| | | EXTINTORES - PALANCA DE PULVERIZADO |
+| | | EXTINTORES - PRECINTO DE SEGURIDAD |
+| | | EXTINTORES - TANQUE O CILINDRO |
+| | | EXTINTORES - TUBO DE SIFÓN |
+| | | ROCIADORES |
+| | SISTEMAS DE EXTINCIÓN | PUERTAS - PUERTAS CORTAFUEGO |
+
+**11. SANEAMIENTO AMBIENTAL**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| SANEAMIENTO AMBIENTAL | FUMIGACIÓN/DESRATIZACIÓN/AFINES | DESINSECTACIÓN |
+| | | DESRATIZACIÓN |
+| | | FUMIGACIÓN |
+
+**12. SISTEMA ELÉCTRICO**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| SISTEMA ELÉCTRICO | CERCO ELÉCTRICO | SISTEMA DE SEGURIDAD PERIMETRAL - ENERGIZADOR |
+| | | SISTEMA DE SEGURIDAD PERIMETRAL - LÍNEAS Y POSTES |
+| | | SISTEMA DE SEGURIDAD PERIMETRAL - PANEL DE CONTROL |
+| | EQUIPOS DE ILUMINACIÓN | EQUIPOS DE EMERGENCIA - LUCES DE EMERGENCIA |
+| | | LUMINARIAS Y/O AFINES - EQUIPOS HIGH BAY |
+| | | LUMINARIAS Y/O AFINES - LUMINARIAS LED |
+| | | LUMINARIAS Y/O AFINES - LUMINARIAS TIPO CAÑÓN |
+| | INSTALACIONES ELÉCTRICAS | CONDUCTORES - CABLE INDOPRENE |
+| | | ESTABILIZADOR - BOBINADO |
+| | | INTERRUPTORES - INTERRUPTOR SIMPLE |
+| | | POZOS A TIERRA - POZOS A TIERRA HORIZONTALES |
+| | | POZOS A TIERRA - POZOS A TIERRA VERTICALES |
+| | | POZOS A TIERRA - TIPO MALLA |
+| | | TABLEROS ELÉCTRICOS - LLAVES DIFERENCIALES |
+| | | TABLEROS ELÉCTRICOS - LLAVES TERMOMAGNÉ TICAS |
+| | | TABLEROS ELÉCTRICOS - PLANOS UNILINARES |
+| | | TOMACORRIENTES - TOMACORRIENTE DOBLE |
+| | LETREROS | LETREROS ILUMINADOS - LETREROS LUMINOSOS |
+| | | LETREROS NO ILUMINADOS - GIGANTOGRAFÍAS |
+| | | LETREROS NO ILUMINADOS |
+| | SUBESTACIÓN | TRANSFORMADOR - CELDAS |
+
+**13. SISTEMA SANITARIO**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| SISTEMA SANITARIO | INSTALACIONES SANITARIAS | ACCESORIOS SANITARIOS - BRIDAS |
+| | | DESATOROS - EQUIPOS DE DESATORO |
+| | | DISPOSITIVOS ELÉCTRICOS - SECADORES DE MANO |
+| | | GRIFERÍAS - FLUXÓMETROS |
+| | | GRIFERÍAS - GRIFERÍA NO TEMPORIZADA |
+| | | GRIFERÍAS - GRIFERÍA TEMPORIZADA |
+| | | INODOROS - ACCESORIOS |
+| | | INODOROS - LLAVE DE CIERRE GENERAL |
+| | | INODOROS - PULSADOR DE DESCARGA FLUXÓMETRO |
+| | | INODOROS - TASA DE INODORO |
+| | | INODOROS - TUBO DE ABASTO |
+| | | INODOROS - VÁLVULA DE CIERRE |
+| | | LAVATORIOS - ACCESORIOS |
+| | | OTROS EQUIPOS SANITARIOS - OTROS |
+| | | POZO DE AGUA - LIMPIEZA |
+| | | POZO DE SÉPTICO - LIMPIEZA |
+| | | POZOS TANQUES Y CISTERNAS - CISTERNAS DE AGUA |
+| | | POZOS TANQUES Y CISTERNAS - TANQUES ELEVADOS DE AGUA |
+| | | REDES DE AGUA - ALIMENTADORES DE AGUA |
+| | | REDES DE DESAGÜE - MONTANTES |
+| | | SUMIDEROS - LIMPIEZA |
+| | | URINARIOS - SISTEMA DE DESCARGA |
+| | | URINARIOS - TRAMPAS Y/O AFINES |
+
+**14. VIDRIOS Y MAMPARAS**
+
+| Grupo | Unidad | Sub Unidad |
+|-------|---------|------------|
+| VIDRIOS Y MAMPARAS | VIDRIOS | VIDRIO CRUDO - LAMINADO DE VIDRIOS |
+| | | VIDRIO CRUDO - PAVONADOS |
+| | | VIDRIO TEMPLADO - ESPEJOS |
+| | | VIDRIO TEMPLADO - MAMPARAS |
+| | | VIDRIO TEMPLADO - MUROS CORTINA |
+| | | VIDRIO TEMPLADO - PUERTAS |
+| | | VIDRIOS - LIMPIEZA |
+
+### 11.3. Flujo del Proceso de Solicitud de Atención
+
+#### Paso 1: Usuario Ingresa al Sistema
+- **Actor**: Usuario (Cliente, Empleado interno)
+- **Acción**: Usuario accede al módulo de "Solicitud de Atención de Incidencia"
+- **Sistema**: Sistema muestra la pantalla principal de creación de solicitud
+
+#### Paso 2: Usuario Ingresa la Razón de Atención de Incidencia
+- **Actor**: Usuario
+- **Acción**: Usuario selecciona "Nueva Solicitud" o "Crear Incidencia"
+- **Sistema**: Sistema muestra el formulario de solicitud
+
+#### Paso 3: Sistema Muestra el Tipo de Solicitud
+- **Actor**: Sistema
+- **Acción**: Sistema presenta lista desplegable con los tipos de solicitud
+- **Opciones**: Mantenimiento / Suministros
+
+#### Paso 4: Usuario Selecciona el Tipo de Solicitud
+- **Actor**: Usuario
+- **Acción**: Usuario selecciona el tipo de solicitud desde la lista desplegable
+- **Campo**: Obligatorio
+- **Sistema**: El sistema permite crear, modificar, eliminar data de categoría a nivel administrador
+
+#### Paso 5: Sistema Muestra Categorías de Acuerdo a Tipo
+- **Actor**: Sistema
+- **Acción**: Sistema filtra y muestra las categorías (Grupos de MTTO) disponibles según el tipo de solicitud seleccionado
+- **Formato**: Lista desplegable dinámica
+
+#### Paso 6: Usuario Selecciona la Categoría (Nivel 1)
+- **Actor**: Usuario
+- **Acción**: Usuario selecciona la CATEGORIA desde la lista desplegable
+- **Ejemplo**: ÁREAS VERDES, CERRAJERÍA, HVAC, SISTEMA ELÉCTRICO, etc.
+- **Campo**: Obligatorio
+- **Nivel**: Nivel 1 de categorización (marcado en amarillo en el catálogo)
+
+#### Paso 7: Sistema Muestra Lista de Opciones Seleccionables de Sub Categorías
+- **Actor**: Sistema
+- **Acción**: Sistema muestra las Unidades de MTTO correspondientes a la categoría seleccionada
+- **Formato**: Lista desplegable dinámica
+- **Filtrado**: Según la categoría seleccionada en el paso anterior
+
+#### Paso 8: Usuario Selecciona la Unidad de MTTO (Nivel 2)
+- **Actor**: Usuario
+- **Acción**: Usuario selecciona la UNIDAD DE MTTO desde la lista desplegable filtrada
+- **Ejemplo**: 
+  - Si seleccionó ÁREAS VERDES: JARDINERÍA, MACETEROS
+  - Si seleccionó CERRAJERÍA: CARPINTERÍA ALUMINIO, CARPINTERÍA DE MADERA, CARPINTERÍA METÁLICA
+  - Si seleccionó HVAC: AIRE ACONDICIONADO, EQUIPOS DE EXTRACCIÓN DE AIRE, EQUIPOS DE VENTILACIÓN
+- **Campo**: Obligatorio
+- **Nivel**: Nivel 2 de categorización (marcado en amarillo en el catálogo)
+- **Importante**: Este es el último nivel que el usuario selecciona. NO hay un tercer nivel para el usuario
+
+#### Paso 9: Sistema Muestra Campo de Descripción
+- **Actor**: Sistema
+- **Acción**: Sistema habilita el campo de descripción de la incidencia
+- **Validación**: El sistema extrae caracteres del campo de descripción (IA) para asociar con tabla de criticidad
+
+#### Paso 10: Usuario Redacta la Descripción
+- **Actor**: Usuario
+- **Acción**: Usuario ingresa una descripción detallada de la incidencia
+- **Campo**: Obligatorio, texto libre
+- **Validación**: Sistema no debe permitir subir requerimientos sin descripción
+- **Análisis**: El sistema analiza el texto para determinar nivel de criticidad
+
+#### Paso 11: Sistema Exige Imágenes del Evento
+- **Actor**: Sistema
+- **Acción**: Sistema solicita al usuario cargar imágenes relacionadas con la incidencia
+- **Formato**: PNG, JPG
+- **Tamaño Máximo**: 10 MB por imagen
+- **Validación**: Sistema no debe permitir subir requerimientos sin fotos
+
+#### Paso 12: Usuario Sube las Imágenes
+- **Actor**: Usuario
+- **Acción**: Usuario carga las imágenes del evento
+- **Campo**: Obligatorio (al menos 1 imagen)
+- **Cantidad**: Máximo 3 imágenes
+- **Validación**: El sistema valida formato y tamaño de archivo
+
+#### Paso 13: Usuario Envía el Requerimiento
+- **Actor**: Usuario
+- **Acción**: Usuario presiona el botón "Enviar" o "Crear Solicitud"
+- **Sistema**: Sistema valida que todos los campos obligatorios estén completos
+- **Validación Final**: 
+  - Tipo de solicitud seleccionado
+  - Categoría completa (todos los niveles)
+  - Descripción ingresada
+  - Al menos 1 imagen cargada
+
+#### Paso 14: Sistema Categoriza de Acuerdo a Tipo de Criticidad
+- **Actor**: Sistema
+- **Acción**: Sistema analiza la descripción y asigna automáticamente un nivel de criticidad/urgencia
+- **Niveles de Criticidad**: 
+  - **Alta**: Emergencias, fallas críticas que requieren atención inmediata
+  - **Media**: Problemas que afectan operaciones pero no son emergencias
+  - **Baja**: Solicitudes de mantenimiento preventivo o mejoras
+- **Método**: Sistema Híbrido (Reglas Determinísticas + Inteligencia Artificial)
+- **Proceso de Asignación**: Ver sección 11.14 para detalles técnicos de implementación
+
+#### Paso 15: Sistema Envía la Solicitud a Equipo FM
+- **Actor**: Sistema
+- **Acción**: Sistema genera el ticket/código de servicio y notifica al equipo correspondiente
+- **Código de Servicio**: Autogenerado por el sistema
+- **Notificaciones**: 
+  - **Criticidad Alta**: Notificación a Supervisor, Service Desk FM vía correo y WhatsApp (solo alta prioridad)
+  - **Criticidad Media/Baja**: Notificación a Service Desk FM vía correo
+- **Ticket Generado**: Sistema genera ticket o código de servicio
+- **Fin del Proceso**
+
+### 11.4. Generación de Código de Servicio/Ticket
+
+**Formato Sugerido**: SRV-AAAA-NNNN
+- **SRV**: Prefijo de Servicio
+- **AAAA**: Año actual (2026)
+- **NNNN**: Número secuencial (0001, 0002, etc.)
+
+**Ejemplo**: SRV-2026-0001
+
+**Reglas**:
+- Código autogenerado al crear la solicitud
+- Único en el sistema
+- Campo de solo lectura
+- Se reinicia el contador cada año
+
+### 11.5. Niveles de Criticidad y Notificaciones
+
+| Nivel de Criticidad | Descripción | Notificación |
+|---------------------|-------------|--------------|
+| **Alta** | Emergencias, fallas críticas, riesgos de seguridad | Supervisor + Service Desk FM (Correo + WhatsApp) |
+| **Media** | Problemas que afectan operaciones normales | Service Desk FM (Correo) |
+| **Baja** | Mantenimiento preventivo, mejoras, suministros | Service Desk FM (Correo) |
+
+**Palabras Clave para Criticidad Alta** (ejemplos):
+- Emergencia
+- Urgente
+- Crítico
+- Falla total
+- Peligro
+- Riesgo
+- Sin funcionamiento
+- Inoperativo
+
+### 11.6. Campos del Formulario de Solicitud
+
+| Campo | Tipo | Obligatorio | Descripción |
+|-------|------|-------------|-------------|
+| **Código de Servicio** | Texto (autogenerado) | Sí | Código único de la solicitud (SRV-AAAA-NNNN) |
+| **Tipo de Solicitud** | Lista desplegable | Sí | Mantenimiento / Suministros |
+| **Categoría** | Lista desplegable | Sí | **CATEGORIA (Nivel 1)** - VISIBLE AL USUARIO |
+| **Unidad de MTTO** | Lista desplegable | Sí | **UNIDAD DE MTTO (Nivel 2)** - VISIBLE AL USUARIO |
+| **Descripción** | Texto libre | Sí | Descripción detallada de la incidencia |
+| **Imágenes** | Archivo (PNG, JPG) | Sí | Mínimo 1, máximo 3 imágenes (10MB cada una) |
+| **Criticidad** | Texto (autogenerado) | Sí | Alta / Media / Baja (asignado por IA) |
+| **Fecha de Solicitud** | Fecha/Hora | Sí | Fecha y hora de creación (automático) |
+| **Usuario Solicitante** | Texto | Sí | Usuario logueado que crea la solicitud |
+| **Cliente/Sede** | Texto | Sí | Cliente y sede donde ocurre la incidencia |
+| **Estado** | Lista | Sí | Nuevo / En Proceso / Atendido / Cerrado |
+
+
+
+**El formulario muestra ÚNICAMENTE 2 campos de categorización**:
+- **Categoría** (Nivel 1): Primera lista desplegable
+- **Unidad de MTTO** (Nivel 2): Segunda lista desplegable (filtrada según la categoría seleccionada)
+
+**NO existe un tercer campo** para SUB UNIDAD DE MTTO en la interfaz del usuario.
+
+El catálogo completo de 3 niveles (sección 11.2.1) se mantiene para referencia administrativa, pero el usuario solo interactúa con 2 niveles.
+
+### 11.7. Gestión de Categorías a Nivel Administrador
+
+**Permisos**: Solo el **Superadministrador** puede gestionar las categorías de mantenimiento.
+
+**Funcionalidades**:
+- **Crear**: Agregar nuevas categorías o unidades de MTTO
+- **Modificar**: Editar nombres o descripciones de categorías existentes
+- **Eliminar**: Eliminar categorías que no se utilizan (validar que no tengan solicitudes asociadas)
+
+**Campos de Categoría en la Base de Datos**:
+- Código de Categoría (autogenerado)
+- Tipo de Solicitud (Mantenimiento/Suministros)
+- Nivel (Categoría/Unidad/Sub Unidad)
+- Nombre de la Categoría
+- Categoría Padre (para nivel 2 y 3)
+- **Visible para Usuario** (Sí/No) - Define si el nivel es seleccionable en la interfaz
+- Estado (Activo/Inactivo)
+
+
+
+**En Base de Datos**: Se almacenan los 3 niveles completos del catálogo
+- Nivel 1: CATEGORIA
+- Nivel 2: UNIDAD DE MTTO
+- Nivel 3: SUB UNIDAD DE MTTO
+
+**En la Interfaz del Usuario**: Solo se muestran 2 niveles
+- Campo 1: **CATEGORIA** (Lista desplegable)
+- Campo 2: **UNIDAD DE MTTO** (Lista desplegable en cascada)
+- ❌ NO existe un tercer campo para SUB UNIDAD DE MTTO
+
+**Uso del Catálogo Completo**:
+- **Para Usuarios**: Ver y seleccionar solo 2 niveles (CATEGORIA y UNIDAD DE MTTO)
+- **Para Administradores**: Ver los 3 niveles completos para planificación y referencia técnica
+- **Para Reportes**: Utilizar toda la información de 3 niveles para análisis detallado
+- **Para Mantenimiento**: El equipo técnico puede consultar el nivel 3 para información específica
+
+**Configuración del Campo "Visible para Usuario"**:
+- Nivel 1 (CATEGORIA): Visible para Usuario = **Sí**
+- Nivel 2 (UNIDAD DE MTTO): Visible para Usuario = **Sí**
+- Nivel 3 (SUB UNIDAD DE MTTO): Visible para Usuario = **No**
+- Visible para Usuario (Sí/No) - Solo las columnas amarillas (CATEGORIA y UNIDAD DE MTTO) son visibles
+
+**Estructura en Base de Datos**:
+- El sistema mantiene los 3 niveles completos en la base de datos para referencia técnica
+- Solo los niveles 1 (CATEGORIA) y 2 (UNIDAD DE MTTO) se muestran al usuario en listas desplegables
+- El nivel 3 (SUB UNIDAD DE MTTO) se mantiene en el catálogo maestro para consultas administrativas y reportes técnicos
+
+### 11.8. Validaciones del Módulo
+
+- **Tipo de Solicitud**: Debe seleccionarse antes de mostrar categorías
+- **Categoría Completa**: Los 2 niveles obligatorios deben completarse (CATEGORIA y UNIDAD DE MTTO)
+- **Listas en Cascada**: La lista de UNIDAD DE MTTO solo muestra opciones relacionadas con la CATEGORIA seleccionada
+- **Descripción Obligatoria**: No se permite enviar solicitud sin descripción
+- **Imágenes Obligatorias**: Mínimo 1 imagen, máximo 3 imágenes
+- **Formato de Imágenes**: Solo PNG y JPG permitidos
+- **Tamaño de Imágenes**: Máximo 10MB por imagen
+- **Campos Obligatorios**: Sistema valida antes de permitir el envío
+- **Código Único**: El código de servicio debe ser único en el sistema
+- **Solo 2 Niveles**: El usuario NUNCA debe ver un tercer nivel de categorización (SUB UNIDAD DE MTTO)
+
+### 11.9. Notificaciones Automáticas
+
+**Al Crear la Solicitud**:
+1. **Al Usuario**: Confirmación de solicitud creada con código de servicio
+2. **Al Equipo FM**: Notificación según criticidad
+   - **Alta**: Correo + WhatsApp a Supervisor y Service Desk
+   - **Media/Baja**: Correo a Service Desk
+
+**Contenido del Correo**:
+- Código de servicio
+- Tipo de solicitud
+- Categoría (Nivel 1)
+- Unidad de MTTO (Nivel 2)
+- Descripción
+- Nivel de criticidad
+- Usuario solicitante
+- Cliente/Sede
+- Link para ver las imágenes
+
+### 11.10. Auditoría del Módulo
+
+El sistema debe registrar en auditoría:
+- Fecha y hora de creación de la solicitud
+- Usuario que creó la solicitud
+- Nivel de criticidad asignado
+- Categorías seleccionadas
+- Cambios de estado de la solicitud
+- Imágenes cargadas (nombre, tamaño, fecha)
+- Notificaciones enviadas (destinatario, fecha, hora)
+- Cambios en las categorías de mantenimiento (administrador)
+
+### 11.11. Funcionalidades de Búsqueda
+
+- Búsqueda por Código de Servicio
+- Búsqueda por Tipo de Solicitud
+- Búsqueda por Categoría/Sub Categoría
+- Búsqueda por Nivel de Criticidad
+- Búsqueda por Estado
+- Búsqueda por Fecha de Solicitud (rango)
+- Búsqueda por Usuario Solicitante
+- Búsqueda por Cliente/Sede
+- Filtros combinados
+
+### 11.12. Sistema de Asignación Automática de Criticidad
+
+**Objetivo**: Clasificar automáticamente las solicitudes de incidencia en tres niveles de criticidad (Alta, Media, Baja) para priorizar la atención del equipo de FM.
+
+**Método**: Sistema Híbrido que combina:
+1. **Reglas por Palabras Clave** (primera validación)
+2. **Inteligencia Artificial GPT-4o-mini de OpenAI** (casos ambiguos)
+
+#### 11.12.1. Clasificación por Palabras Clave
+
+El sistema analiza la descripción de la incidencia buscando palabras clave predefinidas. Si encuentra coincidencia, asigna criticidad automáticamente.
+
+**Tabla de Palabras Clave por Criticidad**:
+
+| Criticidad | Palabras Clave |
+|------------|----------------|
+| **ALTA** | emergencia, urgente, crítico, peligro, riesgo, falla total, inoperativo, sin funcionamiento, incendio, inundación, corto circuito, fuga de gas, colapso, derrumbe, personas atrapadas, accidente, lesionado, amenaza, evacuación, sin agua, sin luz, explosión |
+| **MEDIA** | fallo, malogrado, averiado, no funciona, problema, deficiente, irregular, intermitente, ruido extraño, goteo, fisura, atascado, bloqueado, obstruido, desgaste, sobrecalentamiento, lentitud, demora |
+| **BAJA** | mantenimiento preventivo, revisión, inspección, limpieza, cambio programado, suministro, solicitud de material, mejora, optimización, actualización, solicitud, requerimiento, pedido, instalación nueva, cambio estético, pintura, jardinería |
+
+**Gestión de Palabras Clave**:
+- El **Superadministrador** puede agregar, editar o eliminar palabras clave
+- Puede activar/desactivar palabras temporalmente
+- El sistema registra todas las modificaciones en auditoría
+
+#### 11.12.2. Clasificación por Inteligencia Artificial
+
+**Cuándo se activa**: Solo cuando NO se encuentra ninguna palabra clave en la descripción.
+
+**Modelo utilizado**: GPT-4o-mini de OpenAI
+
+**Datos analizados por la IA**:
+- Descripción de la incidencia
+- Categoría seleccionada (ej: HVAC, SISTEMA ELÉCTRICO)
+- Unidad de MTTO seleccionada (ej: AIRE ACONDICIONADO)
+- Tipo de solicitud (Mantenimiento/Suministros)
+
+**Resultado**: La IA responde con: ALTA, MEDIA o BAJA
+
+**Fallback**: Si la IA no está disponible o falla, el sistema asigna criticidad **MEDIA** por defecto.
+
+#### 11.12.3. Flujo del Sistema
+
+1. Usuario envía solicitud con descripción
+2. Sistema busca palabras clave en la descripción
+3. **¿Encuentra palabra clave?**
+   - **SÍ**: Asigna criticidad según palabra clave → Fin
+   - **NO**: Envía datos a GPT-4o-mini → Asigna criticidad según respuesta de IA → Fin
+
+#### 11.12.4. Validación Manual
+
+- **Service Desk FM** puede revisar y modificar la criticidad asignada automáticamente
+- El sistema registra en auditoría: criticidad original, criticidad modificada, método usado (Reglas/IA/Manual), usuario que modificó
+
+#### 11.12.5. Configuración del Sistema
+
+**Parámetros Configurables**:
+- Activar/desactivar uso de Inteligencia Artificial
+- Criticidad por defecto en caso de error (recomendado: MEDIA)
+- Gestión de palabras clave por criticidad
+
+**Auditoría**:
+- Método utilizado (Reglas/IA)
+- Criticidad asignada
+- Fecha y hora
+- Modificaciones manuales
+
+### 11.13. Gestión y Verificación de Criticidad
+
+**Propósito**: Gestionar el ordenamiento automático de solicitudes según criticidad y permitir la verificación manual de solicitudes de alta prioridad antes de la coordinación con proveedores.
+
+#### 11.13.1. Funcionalidad de Ordenamiento Automático
+
+**Descripción**: Una vez asignada la criticidad mediante el sistema híbrido (sección 11.12), el sistema organiza automáticamente la bandeja de solicitudes.
+
+**Orden de Prioridad**:
+1. **Criticidad Alta** (primer lugar en la lista)
+2. **Criticidad Media** (segundo lugar)
+3. **Criticidad Baja** (tercer lugar)
+
+**Criterios Adicionales de Ordenamiento**:
+- Dentro del mismo nivel de criticidad, ordenar por fecha y hora de creación (más recientes primero)
+- Las solicitudes en estado "Nuevo" aparecen antes que las "En Proceso"
+
+**Visualización**:
+- **Criticidad Alta**: Indicador rojo, icono de urgencia
+- **Criticidad Media**: Indicador amarillo, icono de atención
+- **Criticidad Baja**: Indicador verde, icono normal
+
+#### 11.13.2. Tabla de Clasificación de Términos por Criticidad
+
+Esta tabla define los términos clave que el sistema utiliza para clasificar solicitudes y los tiempos de atención esperados.
+
+| Nivel de Urgencia | Atención | Término en la Descripción | Observación |
+|-------------------|----------|---------------------------|-------------|
+| **Alta** | Inmediata | Caído (ej. "sistema caído") | Servicio o sistema detenido |
+| **Alta** | Inmediata | Falla | Error que afecta la operación |
+| **Alta** | Inmediata | Bloqueo | Usuario o proceso detenido |
+| **Alta** | Inmediata | Emergencia | Requiere atención inmediata |
+| **Alta** | Inmediata | Incendio | Requiere atención inmediata |
+| **Alta** | Inmediata | Fuego | Requiere atención inmediata |
+| **Alta** | Inmediata | Humo | Requiere atención inmediata |
+| **Alta** | Inmediata | Corte | Interrupción de energía, red o servicio |
+| **Alta** | Inmediata | Crítico | Impacto mayor |
+| **Alta** | Inmediata | Urgente | Marcado explícitamente, atención inmediata |
+| **Alta** | Inmediata | Sin acceso | Imposibilidad de ingresar |
+| **Alta** | Inmediata | Interrupción | Corte parcial o total |
+| **Alta** | Inmediata | Pérdida (de datos/servicio) | Datos/servicios comprometidos |
+| **Alta** | Inmediata | Paralizado | Operación detenida totalmente |
+| **Alta** | Inmediata | Averías | En equipos críticos (Ej. ascensor) |
+| **Alta** | Pronto | Observación | Recomendación: ITSE, Auditoría, CC, INDECI |
+| **Alta** | Inmediata | Riesgo | Riesgo inminente |
+| **Alta** | Inmediata | Filtración | Cualquier tipo de filtración de agua |
+| **Media** | Pronto | Retraso | Afecta tiempos, pero no detiene |
+| **Media** | Pronto | Alerta | Señal preventiva |
+| **Media** | Pronto | Inestable | Servicio funciona con fallas |
+| **Media** | Pronto | Incidencia | Requiere solución, pero no crítica |
+| **Media** | Pronto | Revisión | Necesita validación |
+| **Media** | Pronto | Advertencia | Riesgo potencial |
+| **Media** | Pronto | Pendiente | En espera de acción |
+| **Media** | Pronto | Plaga | Reporte de plagas |
+| **Media** | Pronto | No enfría | Aire acondicionado |
+| **Baja** | Programable | Consulta | Pregunta sin impacto operativo |
+| **Baja** | Programable | Soporte | Asistencia planificable |
+| **Baja** | Programable | Mantenimiento | Preventivo o programado |
+| **Baja** | Programable | Mejora | Cambio para optimizar |
+| **Baja** | Programable | Solicitud | Pedido administrativo/técnico |
+| **Baja** | Programable | Actualización | Cambio de versión/configuración |
+| **Baja** | Programable | Configuración | Ajuste planificado |
+| **Baja** | Programable | Capacitación | Formación o entrenamiento |
+| **Baja** | Programable | Requerimiento | Solicitud general |
+
+**Tiempos de Atención Esperados**:
+- **Inmediata**: Atención en menos de 1 hora
+- **Pronto**: Atención en el mismo día (máximo 8 horas)
+- **Programable**: Atención dentro de 24-72 horas
+
+**Gestión de Términos**:
+- El **Superadministrador** puede agregar, editar o eliminar términos
+- Puede activar/desactivar términos temporalmente
+- Puede cambiar el nivel de criticidad asociado a un término
+- El sistema registra todas las modificaciones en auditoría
+
+#### 11.13.3. Verificación Obligatoria para Criticidad Alta
+
+**Regla de Negocio**: Las solicitudes con criticidad ALTA requieren verificación obligatoria por Service Desk FM o Supervisor de MTTO antes de iniciar coordinación con proveedores.
+
+**Roles Autorizados para Verificar**:
+- Service Desk FM
+- Supervisor de MTTO
+
+**Notificación Automática**:
+- **Cuando**: Se crea una solicitud con criticidad ALTA
+- **Destinatarios**: Service Desk FM + Supervisor de MTTO
+- **Medios**: Correo electrónico + WhatsApp
+
+**Proceso de Verificación**:
+1. Usuario revisa la solicitud en detalle
+2. Valida descripción, imágenes, categoría y nivel de criticidad
+3. Decide si la criticidad asignada es correcta
+4. Si NO es correcta: modifica la criticidad (ver sección 11.13.5)
+5. Si es correcta: aprueba y puede iniciar coordinación con proveedores
+
+**Validaciones**:
+- El sistema NO permite asignar proveedores a solicitudes de criticidad ALTA sin verificación
+- Solo solicitudes de criticidad **ALTA** requieren verificación obligatoria
+- Solicitudes de criticidad **MEDIA** y **BAJA** pueden pasar directamente a coordinación
+
+#### 11.13.4. Interfaz de Bandeja de Solicitudes
+
+**Descripción**: Pantalla principal donde Service Desk FM y Supervisor de MTTO visualizan todas las solicitudes ordenadas por criticidad.
+
+**Elementos de la Interfaz**:
+
+**Filtros Disponibles**:
+- Nivel de criticidad (Alta/Media/Baja)
+- Estado (Nuevo/En Proceso/Atendido/Cerrado)
+- Tipo de solicitud (Mantenimiento/Suministros)
+- Categoría
+- Fecha de creación (rango)
+- Cliente/Sede
+- Usuario solicitante
+
+**Columnas de la Lista**:
+- Código de servicio (SRV-AAAA-NNNN)
+- Indicador visual de criticidad (color + icono)
+- Tipo de solicitud
+- Categoría + Unidad de MTTO
+- Descripción (resumen)
+- Cliente/Sede
+- Fecha de creación
+- Estado
+- Asignado a (proveedor/técnico)
+- Acciones (Ver detalle, Modificar criticidad, Asignar)
+
+**Indicadores Visuales**:
+- **Rojo + Icono de Alerta**: Criticidad Alta, requiere verificación
+- **Amarillo + Icono de Atención**: Criticidad Media
+- **Verde + Icono Normal**: Criticidad Baja
+- **Badge "Requiere Verificación"**: Para solicitudes ALTA sin verificar
+
+**Contador de Solicitudes**:
+- Total de solicitudes
+- Solicitudes por criticidad (Alta: X, Media: Y, Baja: Z)
+- Solicitudes pendientes de verificación
+
+#### 11.13.5. Cambio Manual de Criticidad
+
+**Descripción**: Funcionalidad que permite a Service Desk FM y Supervisor de MTTO modificar manualmente la criticidad asignada automáticamente.
+
+**Roles Autorizados**:
+- Service Desk FM
+- Supervisor de MTTO
+
+**Acceso**:
+- Desde la bandeja de solicitudes (botón "Modificar Criticidad")
+- Desde la vista de detalle de la solicitud
+
+**Formulario de Cambio**:
+
+| Campo | Tipo | Obligatorio | Descripción |
+|-------|------|-------------|-------------|
+| **Criticidad Original** | Texto (solo lectura) | - | Criticidad asignada por el sistema |
+| **Método Original** | Texto (solo lectura) | - | Reglas / IA / Manual |
+| **Nueva Criticidad** | Lista desplegable | Sí | Alta / Media / Baja |
+| **Justificación** | Texto libre | No | Razón del cambio (opcional, recomendado) |
+
+**Opciones de Cambio Permitidas**:
+- De Alta a Media
+- De Alta a Baja
+- De Media a Alta
+- De Media a Baja
+- De Baja a Alta
+- De Baja a Media
+
+**Validaciones**:
+- El usuario debe tener rol de Service Desk FM o Supervisor de MTTO
+- No se puede cambiar la criticidad de solicitudes cerradas
+- El sistema debe solicitar confirmación antes de aplicar el cambio
+
+**Acciones del Sistema al Cambiar Criticidad**:
+1. Actualiza el campo de criticidad en la solicitud
+2. Reordena la bandeja de solicitudes según nueva criticidad
+3. Registra en auditoría (ver campos abajo)
+4. Si el cambio es de Alta a Media/Baja: envía notificación al usuario solicitante
+5. Si el cambio es de Media/Baja a Alta: envía notificación a Service Desk + Supervisor
+
+**Campos de Auditoría**:
+- Código de solicitud
+- Criticidad original
+- Método de asignación original (Reglas/IA)
+- Nueva criticidad
+- Usuario que realizó el cambio
+- Rol del usuario
+- Fecha y hora del cambio
+- Justificación ingresada
+- IP del usuario (opcional)
+
+#### 11.13.6. Notificaciones del Proceso
+
+| Evento | Destinatarios | Medios |
+|--------|---------------|--------|
+| Nueva solicitud criticidad ALTA | Service Desk FM + Supervisor MTTO | Correo + WhatsApp |
+| Nueva solicitud criticidad MEDIA | Service Desk FM | Correo |
+| Nueva solicitud criticidad BAJA | Service Desk FM | Correo |
+| Cambio de criticidad (Alta → Media/Baja) | Usuario solicitante | Correo |
+| Cambio de criticidad (Media/Baja → Alta) | Service Desk FM + Supervisor MTTO | Correo + WhatsApp |
+| Asignación a proveedor/técnico | Proveedor/Técnico asignado | Correo + WhatsApp |
+| Solicitud Alta sin verificar >2 horas | Supervisor de MTTO | WhatsApp |
+
+#### 11.13.7. Reglas de Negocio
+
+- **RN-11.13.1**: Solo solicitudes de criticidad ALTA requieren verificación obligatoria antes de coordinación con proveedores
+- **RN-11.13.2**: El sistema ordena automáticamente las solicitudes por criticidad (Alta > Media > Baja) y dentro del mismo nivel por fecha de creación
+- **RN-11.13.3**: Solo Service Desk FM y Supervisor de MTTO pueden modificar manualmente la criticidad
+- **RN-11.13.4**: Todos los cambios manuales de criticidad quedan registrados en auditoría con usuario, fecha y justificación
+- **RN-11.13.5**: El sistema NO permite asignar proveedores a solicitudes de criticidad ALTA sin verificación previa
+- **RN-11.13.6**: Si una solicitud de criticidad ALTA no es verificada en 2 horas, el sistema envía alerta al Supervisor de MTTO
+- **RN-11.13.7**: Los términos de la tabla de clasificación son configurables solo por el Superadministrador
