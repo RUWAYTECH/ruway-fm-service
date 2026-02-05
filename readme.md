@@ -3139,37 +3139,52 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 - Reabre formulario de programación para el proveedor
 - Proveedor debe proponer nueva fecha
 
-### 13.4. Coordinación Final y Confirmación de Fecha
+### 13.4. Funcionalidad de Coordinación Final y Confirmación de Fecha
 
-**Descripción**: Proceso de coordinación manual entre Supervisor MTTO y proveedor para confirmar detalles operativos finales.
+**Propósito**: Permitir el registro de la fecha definitiva del servicio después de la coordinación manual entre Supervisor MTTO y proveedor.
 
-**Coordinación Manual** (FUERA DEL SISTEMA):
-- **Actor**: Supervisor de MTTO
-- **Medio**: Correo electrónico o WhatsApp
-- **Propósito**: Confirmar detalles operativos, punto de contacto en sede, requisitos especiales
-- **Nota**: Esta coordinación es manual y no se registra automáticamente en el sistema
+**Nota Importante**: La coordinación de detalles operativos, punto de contacto en sede y requisitos especiales se realiza **fuera del sistema** mediante correo electrónico o WhatsApp. El sistema solo registra el resultado final de esta coordinación.
 
-**Registro de Fecha Confirmada en el Sistema**:
+#### 13.4.1. Funcionalidad de Registro de Fecha Confirmada
 
-**Actor**: Supervisor de MTTO
+El sistema debe proporcionar:
+- Campo "Fecha Confirmada" para registrar la fecha definitiva de inicio de servicio
+- Formato de fecha: dd/mm/yyyy
+- Calendario visual para selección de fecha
+- Validación automática: la fecha no puede ser anterior al día actual
+- Campo opcional para observaciones o detalles adicionales
+- Botón "Confirmar Fecha de Servicio"
 
-**Funcionalidad**: Registrar la fecha final coordinada
+#### 13.4.2. Validaciones del Sistema
 
-**Campo**:
-- **Fecha Confirmada**: Fecha definitiva de inicio de servicio
-- **Formato**: dd/mm/yyyy
-- **Validación**: No puede ser anterior a hoy
+El sistema debe validar:
+- Fecha confirmada no sea anterior a la fecha actual
+- Fecha confirmada sea coherente con el plazo del servicio
+- Confirmación de que se ha completado la coordinación manual
+- Campos obligatorios estén completos
 
-**Acciones del Sistema al Confirmar Fecha**:
-1. Actualiza estado a "Servicio Programado"
-2. Registra fecha confirmada
-3. Genera notificaciones:
-   - Al cliente (información del servicio programado)
-   - Al proveedor (confirmación final)
-4. Programa recordatorios automáticos:
-   - 24 horas antes del servicio: Correo + WhatsApp
-   - 2 horas antes del servicio: WhatsApp
-5. Registra en auditoría
+#### 13.4.3. Acciones Automáticas al Confirmar Fecha
+
+El sistema debe ejecutar automáticamente:
+
+**1. Actualización de Estado**:
+- Cambiar estado del servicio a "Servicio Programado"
+- Registrar fecha y hora de confirmación
+- Registrar usuario que confirmó (Supervisor de MTTO)
+
+**2. Generación de Notificaciones**:
+- **Al Cliente**: Correo electrónico con información del servicio programado (fecha, hora, proveedor, tipo de servicio)
+- **Al Proveedor**: Correo de confirmación final con detalles del servicio
+
+**3. Programación de Recordatorios Automáticos**:
+- **24 horas antes del servicio**: Envío de recordatorio por correo electrónico y WhatsApp a todas las partes
+- **2 horas antes del servicio**: Envío de recordatorio por WhatsApp al proveedor y supervisor
+
+**4. Registro de Auditoría**:
+- Usuario que confirmó la fecha
+- Fecha y hora de confirmación
+- Fecha programada del servicio
+- Cambio de estado registrado
 
 ### 13.5. Campos del Módulo de Programación
 
