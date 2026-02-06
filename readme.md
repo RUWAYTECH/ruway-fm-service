@@ -3996,6 +3996,87 @@ El módulo de Cotización Formal para Cliente permite al Facility Manager (FM) e
 - El monto total debe ser razonable (alertas si excede 200% del monto base)
 - Sistema registra justificación si el FEE es mayor al 50%
 
+#### 15.4.4. Generación Automática de Documento de Cotización
+
+**Propósito**: El sistema debe generar automáticamente el documento formal de cotización en formato Excel con el diseño estándar de la empresa, incluyendo todos los cálculos, desglose de costos y condiciones comerciales.
+
+**Formato Disponible**:
+- **Excel (.xlsx)**: Formato editable y oficial para envío al cliente
+
+**Momento de Generación**:
+- Después de que FM complete todos los campos de la cotización
+- Antes de enviar la cotización al cliente
+- El documento se genera haciendo clic en botón "Generar Documento" o "Vista Previa"
+
+**Diseño del Documento de Cotización**:
+
+El documento debe seguir el formato estándar mostrado a continuación:
+
+![Formato de Cotización de Servicio](assets/cotizacion-de-servicio.png)
+
+**Componentes del Documento** (según imagen de referencia):
+- Encabezado con logo y datos de la empresa
+- Información del cliente (RUC, dirección, contacto)
+- Detalle de la solicitud y servicio
+- Tabla de costos y cantidades
+- Desglose financiero (Subtotal, FEE, IGV, Total)
+- Condiciones comerciales (plazo, forma de pago, validez)
+- Observaciones
+- Firma del FM y datos de contacto
+
+**Diferenciación por Tipo de Cliente**:
+- **Cliente Externo**: Incluye campo "Margen FEE Contractual" de referencia
+- **Cliente Interno**: Omite referencia a margen contractual
+
+**Funcionalidades del Sistema para Generación del Documento**:
+
+1. **Vista Previa**:
+   - Botón "Vista Previa" que muestra el documento antes de generar
+   - Permite al FM revisar el formato y contenido
+   - No genera archivo, solo muestra visualización
+
+2. **Generación de Excel**:
+   - Botón "Generar Excel"
+   - Sistema utiliza plantilla predefinida de Excel (configurada en Datos Maestros 10.15)
+   - Rellena automáticamente todos los campos dinámicos
+   - Aplica formato de celdas, bordes y estilos según plantilla
+   - Genera archivo .xlsx descargable
+
+3. **Almacenamiento Automático**:
+   - El documento generado se almacena automáticamente en el sistema
+   - Se vincula con el registro de cotización
+   - Se mantiene versión del documento
+   - Se registra en auditoría (fecha, hora, usuario que generó)
+
+4. **Adjuntar al Correo**:
+   - El documento Excel generado se adjunta automáticamente al correo de envío
+   - El documento queda disponible para descarga en el Portal de Clientes
+
+**Plantilla de Cotización (Datos Maestros)**:
+- La plantilla debe configurarse en el **Módulo 10.15 - Plantillas de Documentos**
+- Código de Plantilla: **COTIZ**
+- Formato: Excel (.xlsx)
+- Campos dinámicos marcados con [tags] que el sistema reemplaza automáticamente
+
+**Validaciones de Generación**:
+- Todos los campos obligatorios deben estar completos antes de generar
+- El logo de la empresa debe estar configurado en Datos Maestros
+- La plantilla debe estar activa en el sistema
+- Los cálculos de FEE e IGV deben ser correctos
+
+**Reglas de Negocio para Generación de Documentos**:
+- **RN-15.11**: El documento solo puede generarse si todos los cálculos están completos
+- **RN-15.12**: Cada vez que se genera un documento, se crea una nueva versión si hubo cambios
+- **RN-15.13**: El documento Excel es la versión oficial para envío al cliente
+- **RN-15.14**: Una vez generado y enviado, el documento queda bloqueado para edición
+- **RN-15.15**: Una vez generado y enviado, el documento queda bloqueado para edición
+
+**Auditoría de Generación de Documentos**:
+- Fecha y hora de generación
+- Usuario que generó el documento
+- Versión del documento
+- Descarga del documento (quién y cuándo)
+
 ### 15.5. Envío de Cotización a Clientes
 
 #### 15.5.1. Preparación de Cotización para Envío
