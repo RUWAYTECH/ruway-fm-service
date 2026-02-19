@@ -3290,6 +3290,8 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
   - Criticidad
   - **Enlace de carga de cotización** (para compartir con proveedores)
 
+**Nota:** Los roles Service Desk, Supervisor de MTTO y FM deben contar con la opción de derivar la cotización tanto al proveedor y area de compras.
+
 ### 12.2. Generación de Enlaces de Cotización
 
 **Descripción**: Sistema genera enlaces únicos para que cada proveedor cargue su cotización.
@@ -3323,39 +3325,37 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 
 | Campo | Tipo | Obligatorio | Validaciones | Descripción |
 |-------|------|-------------|--------------|-------------|
-| **Archivo de Cotización** | Archivo | Sí | PDF, XLS, XLSX, DOC, DOCX; Max 10MB | Documento con la propuesta |
-| **Monto Total** | Numérico | Sí | Mayor a 0, máximo 2 decimales | Monto total cotizado |
+| **Archivo de Cotización** | Archivo | Sí | PDF; Max 10MB | Documento con la propuesta |
+| **Monto Total sin IGV** | Numérico | Sí | Mayor a 0, máximo 2 decimales | Monto total cotizado |
 | **Moneda** | Lista desplegable | Sí | Soles (PEN) / Dólares (USD) | Moneda de cotización |
 | **Tiempo de Entrega** | Numérico | Sí | Mayor a 0, en días | Días para completar servicio |
 | **Validez de Cotización** | Numérico | Sí | Mayor a 0, en días | Días de vigencia de la propuesta |
 | **Observaciones** | Texto libre | No | Máximo 500 caracteres | Comentarios adicionales |
+| **Items** | Nombres de item | No | Máximo 500 caracteres | *PENDIENTE DE DENIFIR EL FORMATO* |
+
+
 
 **Validaciones al Cargar**:
 - Validación de formato de archivo permitido
 - Validación de tamaño máximo (10 MB)
-- Escaneo antivirus del archivo
 - Monto debe ser numérico y mayor a 0
 - Tiempo de entrega debe ser numérico
 
 **Acciones del Sistema**:
-- Al cargar exitosamente: notifica a Service Desk FM y Compras
-- Marca estado de cotización como "Recibida"
-- Permite al proveedor ver confirmación de carga exitosa
-- Bloquea edición después de enviar (requiere contacto con FM para cambios)
+- Al cargar exitosamente: notifica a Service Desk, Supervidor, FM y Compras
 
 ### 12.4. Bandeja de Cotizaciones para FM/Compras
 
-**Descripción**: Interfaz para que Service Desk FM, Supervisor de MTTO y Compras visualicen y comparen cotizaciones recibidas.
+**Descripción**: Interfaz para que Service Desk, FM, Supervidor = Supervisor de MTTO y Compras visualicen y comparen cotizaciones recibidas.
 
 **Vista de Lista de Cotizaciones**:
 
 **Filtros Disponibles**:
 - Por solicitud (código SRV-AAAA-NNNN)
 - Por proveedor
-- Por estado (Pendiente/Recibida/Aprobada/Rechazada)
+- Por estado (Pendiente/Recibida)
 - Por fecha de solicitud
 - Por criticidad de la incidencia
-- Derivadas a Compras (Sí/No)
 
 **Columnas de la Vista**:
 - Código de solicitud
@@ -3363,11 +3363,13 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 - Proveedores solicitados vs proveedores que respondieron
 - Montos cotizados (comparativa)
 - Tiempos de entrega
-- Estado de cada cotización
+- Estado de cada cotización (Aceptada, Aprobada, Rechazada)
 - Fecha límite de respuesta
-- Acciones (Ver detalle, Aprobar, Rechazar)
+- Descargar arhivo PDF
+- Acciones (Ver detalle)
 
 **Vista de Comparación**:
+- Ordenar del monto menor a mayor
 - Tabla comparativa lado a lado de todas las cotizaciones
 - Columnas: Proveedor, Monto, Moneda, Tiempo Entrega, Validez
 - Destacado visual del menor monto y menor tiempo
@@ -3379,9 +3381,8 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 **Descripción**: Funcionalidad para que FM seleccione y apruebe la mejor cotización.
 
 **Roles Autorizados**:
-- Service Desk FM
-- Supervisor de MTTO
-- Compras (si fue derivado)
+- FM (Es el unico rol autorizado para aprobar la cotización)
+
 
 **Proceso de Aprobación**:
 
@@ -3411,6 +3412,8 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 5. Envía notificación a proveedores no seleccionados (cotizaciones rechazadas)
 6. Registra en auditoría
 
+**NOTA** Definir contenidos de correo tanto para el ganodor y para los rechazados.
+
 ### 12.6. Campos del Módulo de Cotización
 
 | Campo | Tipo | Obligatorio | Descripción |
@@ -3418,7 +3421,6 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | **Código de Solicitud** | Texto (referencia) | Sí | Código de la solicitud de incidencia (SRV-AAAA-NNNN) |
 | **Proveedores Seleccionados** | Lista múltiple | Sí | Proveedores a los que se solicita cotización |
 | **Estado de Cotización** | Lista | Sí | Pendiente / En Proceso / Recibida / Aprobada / Rechazada |
-| **Derivado a Compras** | Sí/No | Sí | Indica si requiere gestión de Compras |
 | **Fecha de Solicitud** | Fecha/Hora | Sí | Fecha en que se solicita cotización |
 | **Fecha Límite de Respuesta** | Fecha | Sí | Plazo para recibir cotizaciones |
 | **Enlace de Carga** | URL (autogenerado) | Sí | Link único para cada proveedor |
@@ -3438,11 +3440,11 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | Evento | Destinatarios | Medio | Tipo |
 |--------|---------------|-------|------|
 | Solicitud derivada a Compras | Área de Compras | Correo | Automático |
-| Solicitud de cotización a proveedor | Proveedores seleccionados | Correo | **Manual** (por Compras) |
+| Solicitud de cotización a proveedor | Proveedores seleccionados | Correo | Automatico al proveedor |
 | Proveedor carga cotización | Service Desk FM + Compras | Correo | Automático |
 | Cotización aprobada (incluye link programación) | Proveedor seleccionado | Correo | Automático |
-| Cotización rechazada | Proveedores no seleccionados | Correo | Automático |
-| Plazo de cotización próximo a vencer (24h) | Proveedores sin respuesta | Correo | Automático |
+| Cotización rechazada (Opcional parametrizado para activar y inactivar la notificación) | Proveedores no seleccionados | Correo | Automático |
+| En caso que no se cuente con cotizaciones, Plazo de cotización próximo a vencer (24h) | Proveedores sin respuesta | Correo | Automático |
 
 ### 12.8. Validaciones del Módulo de Cotización
 
@@ -3450,17 +3452,16 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 - El enlace de carga de cotización es único y expira después de la fecha límite de respuesta
 - Solo el proveedor asignado puede acceder a su enlace de carga
 - No se puede aprobar una cotización sin que haya sido cargada por el proveedor
-- El sistema debe validar que el archivo de cotización tenga formato permitido (PDF, Excel, Word)
-- Archivo debe pasar escaneo antivirus antes de almacenarse
+- El sistema debe validar que el archivo de cotización tenga formato permitido (PDF)
 - Al aprobar una cotización, el sistema automáticamente rechaza las demás cotizaciones de la misma solicitud
 - Validación de campos numéricos (monto > 0, tiempo entrega > 0)
 
 ### 12.9. Reglas de Negocio del Módulo de Cotización
 
-- **RN-12.1**: Si el servicio requiere especialización, debe derivarse obligatoriamente a Compras
+- **RN-12.1**: El FM es el eencargado de que el servicio debe derivarse obligatoriamente a Compras
 - **RN-12.2**: El enlace de carga de cotización es único por proveedor y por solicitud
 - **RN-12.3**: Las cotizaciones vencidas (fuera de fecha límite) quedan marcadas como "Expiradas" automáticamente
-- **RN-12.4**: Solo Service Desk FM, Supervisor de MTTO y Compras pueden aprobar cotizaciones
+- **RN-12.4**: El FM es el unico que puede aprobar cotizaciones
 - **RN-12.5**: Al aprobar una cotización, el sistema genera automáticamente el enlace de programación de servicio
 - **RN-12.6**: El monto cotizado debe registrarse en la moneda original (PEN o USD) para posterior conversión si es necesario
 - **RN-12.7**: El proveedor no puede editar ni eliminar su cotización después de enviarla
@@ -3505,12 +3506,12 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 **Seguridad del Enlace**:
 - Token único por proveedor y por solicitud
 - Solo el proveedor aprobado puede acceder
-- Expira después de 30 días de emitido
-- Acceso directo sin login o con credenciales del proveedor
+- Expira después de 3 días de emitido
+- Acceos con Credenciales del proveedor
 
 ### 13.2. Portal de Proveedores - Formulario de Programación
 
-**Descripción**: Interfaz en Portal de Proveedores donde el proveedor selecciona tipo de servicio y fecha de inicio.
+**Descripción**: Interfaz en Portal de Proveedores donde el proveedor visualiza tipo de servicio y fecha de inicio.
 
 **Acceso**:
 - Mediante enlace único recibido por correo
@@ -3525,7 +3526,7 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | **Fecha de Inicio Propuesta** | Calendario (fecha) | Sí | Ver validaciones por tipo | dd/mm/yyyy |
 | **Observaciones** | Texto libre | No | Máximo 500 caracteres | Comentarios sobre la programación |
 
-**Validaciones por Tipo de Servicio**:
+**Mensaje informativo para el proveedor**:
 
 **Si es NACIONAL**:
 - Fecha propuesta NO puede exceder 3 días calendario desde fecha de aprobación de cotización
@@ -3545,50 +3546,7 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 - Valida que fecha no sea anterior a hoy
 - Permite campo de observaciones para justificar plazos
 
-### 13.3. Validación de Programación por Supervisor MTTO
-
-**Descripción**: Funcionalidad que permite al Supervisor de MTTO revisar y aprobar/rechazar la programación propuesta por el proveedor.
-
-**Rol Autorizado**:
-- Supervisor de MTTO
-
-**Notificación Automática**:
-- **Cuándo**: Proveedor envía fecha propuesta
-- **Destinatario**: Supervisor de MTTO
-- **Medio**: Correo electrónico
-- **Contenido**: Código de solicitud, proveedor, tipo de servicio, fecha propuesta, link al sistema
-
-**Interfaz de Validación**:
-
-**Vista de Detalle**:
-- Código de solicitud
-- Descripción de la incidencia
-- Proveedor asignado
-- Monto aprobado
-- Tipo de servicio (Nacional/Importación)
-- Fecha propuesta por proveedor
-- Observaciones del proveedor
-- Plazo máximo (si es nacional)
-- Cliente y sede
-
-**Opciones del Supervisor**:
-- **Aprobar**: Da VB a la programación
-- **Rechazar**: Solicita nueva fecha al proveedor
-- **Campo obligatorio si rechaza**: Motivo del rechazo
-
-**Acciones al Aprobar**:
-- Actualiza estado a "Programación Validada"
-- Permite continuar con coordinación final
-- Notifica al proveedor de la aprobación
-- Habilita campo de "Fecha Confirmada"
-
-**Acciones al Rechazar**:
-- Actualiza estado a "Programación Rechazada"
-- Notifica al proveedor con motivo de rechazo
-- Reabre formulario de programación para el proveedor
-- Proveedor debe proponer nueva fecha
-
-### 13.4. Funcionalidad de Coordinación Final y Confirmación de Fecha
+### 13.3. Funcionalidad de Coordinación Final y Confirmación de Fecha
 
 **Propósito**: Permitir el registro de la fecha definitiva del servicio después de la coordinación manual entre Supervisor MTTO y proveedor.
 
@@ -3612,28 +3570,6 @@ El sistema debe validar:
 - Confirmación de que se ha completado la coordinación manual
 - Campos obligatorios estén completos
 
-#### 13.4.3. Acciones Automáticas al Confirmar Fecha
-
-El sistema debe ejecutar automáticamente:
-
-**1. Actualización de Estado**:
-- Cambiar estado del servicio a "Servicio Programado"
-- Registrar fecha y hora de confirmación
-- Registrar usuario que confirmó (Supervisor de MTTO)
-
-**2. Generación de Notificaciones**:
-- **Al Cliente**: Correo electrónico con información del servicio programado (fecha, hora, proveedor, tipo de servicio)
-- **Al Proveedor**: Correo de confirmación final con detalles del servicio
-
-**3. Programación de Recordatorios Automáticos**:
-- **24 horas antes del servicio**: Envío de recordatorio por correo electrónico y WhatsApp a todas las partes
-- **2 horas antes del servicio**: Envío de recordatorio por WhatsApp al proveedor y supervisor
-
-**4. Registro de Auditoría**:
-- Usuario que confirmó la fecha
-- Fecha y hora de confirmación
-- Fecha programada del servicio
-- Cambio de estado registrado
 
 ### 13.5. Campos del Módulo de Programación
 
@@ -3661,14 +3597,8 @@ El sistema debe ejecutar automáticamente:
 
 | Evento | Destinatarios | Medio | Tipo |
 |--------|---------------|-------|------|
-| Cotización aprobada (incluye link programación) | Proveedor aprobado | Correo | Automático |
-| Proveedor propone fecha | Supervisor de MTTO | Correo | Automático |
-| Programación validada | Proveedor | Correo | Automático |
-| Programación rechazada | Proveedor | Correo | Automático |
-| Coordinación manual de fecha | Proveedor | Correo/WhatsApp | **Manual** |
-| Fecha confirmada | Proveedor + Cliente | Correo | Automático |
-| Recordatorio 24h antes del servicio | Proveedor + Supervisor MTTO | Correo + WhatsApp | Automático |
-| Recordatorio 2h antes del servicio | Proveedor + Supervisor MTTO | WhatsApp | Automático |
+Programación generada| Programación validada | Proveedor | Correo | Automático |
+
 
 ### 13.7. Validaciones del Módulo de Programación
 
@@ -3712,7 +3642,7 @@ El sistema debe ejecutar automáticamente:
 
 ## 14. Portal de Proveedores
 
-**Propósito**: Proporcionar una interfaz web independiente para que los proveedores puedan cargar cotizaciones, programar servicios y gestionar sus asignaciones de manera segura y eficiente.
+**Propósito**: Proporcionar una interfaz web independiente para que los proveedores puedan cargar cotizaciones, visualizar la programación de sus servicios y gestionar sus asignaciones de manera segura y eficiente.
 
 ### 14.1. Características del Portal de Proveedores
 
@@ -3764,14 +3694,12 @@ El sistema debe ejecutar automáticamente:
 **Indicadores**:
 - Cotizaciones pendientes (número)
 - Programaciones por confirmar (número)
-- Servicios próximos (en 48h)
-- Alertas de vencimiento de plazo
 
 #### 14.3.2. Módulo de Cotizaciones
 
 **Funcionalidades**:
 - Ver solicitudes de cotización recibidas
-- Cargar archivo de cotización (PDF, Excel, Word)
+- Cargar archivo de cotización (PDF)
 - Ingresar monto, moneda, tiempo de entrega
 - Ver estado de cotización (Pendiente, Aprobada, Rechazada)
 - Historial de cotizaciones enviadas
@@ -3829,8 +3757,7 @@ El sistema debe ejecutar automáticamente:
 
 **Medios**:
 - Correo electrónico
-- Notificaciones push en el portal (cuando el proveedor está logueado)
-- WhatsApp (para recordatorios de servicios)
+
 
 **Eventos**:
 - Nueva solicitud de cotización asignada
@@ -3838,8 +3765,6 @@ El sistema debe ejecutar automáticamente:
 - Cotización rechazada
 - Recordatorio de plazo de cotización próximo a vencer
 - Solicitud de programación disponible
-- Programación validada/rechazada
-- Recordatorio de servicio próximo (24h y 2h antes)
 
 ### 14.6. Auditoría del Portal de Proveedores
 
@@ -3858,7 +3783,6 @@ El sistema debe ejecutar automáticamente:
 - **RN-14.3**: Los enlaces con token expiran después de 30 días de emitidos
 - **RN-14.4**: El proveedor debe cambiar su contraseña cada 3 meses (ver sección 3.1)
 - **RN-14.5**: El portal debe ser accesible 24/7 con disponibilidad mínima de 99%
-- **RN-14.6**: Todos los archivos cargados deben pasar validación antivirus antes de almacenarse
 - **RN-14.7**: El proveedor no puede eliminar cotizaciones o programaciones después de enviarlas
 
 
@@ -4014,20 +3938,19 @@ El módulo de Cotización Formal para Cliente permite al Facility Manager (FM) e
 
 **Validaciones para Cliente Interno**:
 - FEE debe ser mayor a 0
-- El monto total debe ser razonable (alertas si excede 200% del monto base)
-- Sistema registra justificación si el FEE es mayor al 50%
+
 
 #### 15.4.4. Generación Automática de Documento de Cotización
 
 **Propósito**: El sistema debe generar automáticamente el documento formal de cotización en formato Excel con el diseño estándar de la empresa, incluyendo todos los cálculos, desglose de costos y condiciones comerciales.
 
 **Formato Disponible**:
-- **Excel (.xlsx)**: Formato editable y oficial para envío al cliente
+- **Formulario editable y exportable a pdf**: Formato editable y oficial para envío al cliente
 
 **Momento de Generación**:
 - Después de que FM complete todos los campos de la cotización
 - Antes de enviar la cotización al cliente
-- El documento se genera haciendo clic en botón "Generar Documento" o "Vista Previa"
+- El documento se genera haciendo clic en botón "Generar Documento"
 
 **Diseño del Documento de Cotización**:
 
@@ -4056,12 +3979,12 @@ El documento debe seguir el formato estándar mostrado a continuación:
    - Permite al FM revisar el formato y contenido
    - No genera archivo, solo muestra visualización
 
-2. **Generación de Excel**:
-   - Botón "Generar Excel"
-   - Sistema utiliza plantilla predefinida de Excel (configurada en Datos Maestros 10.15)
+2. **Generación de PDF**:
+   - Botón "Generar PDF"
+   - Sistema utiliza plantilla el formulario  (configurada en Datos Maestros 10.15)
    - Rellena automáticamente todos los campos dinámicos
    - Aplica formato de celdas, bordes y estilos según plantilla
-   - Genera archivo .xlsx descargable
+   - Genera archivo .pdf descargable
 
 3. **Almacenamiento Automático**:
    - El documento generado se almacena automáticamente en el sistema
@@ -4070,13 +3993,11 @@ El documento debe seguir el formato estándar mostrado a continuación:
    - Se registra en auditoría (fecha, hora, usuario que generó)
 
 4. **Adjuntar al Correo**:
-   - El documento Excel generado se adjunta automáticamente al correo de envío
+   - El documento pdf generado se adjunta automáticamente al correo de envío
    - El documento queda disponible para descarga en el Portal de Clientes
 
 **Plantilla de Cotización (Datos Maestros)**:
 - La plantilla debe configurarse en el **Módulo 10.15 - Plantillas de Documentos**
-- Código de Plantilla: **COTIZ**
-- Formato: Excel (.xlsx)
 - Campos dinámicos marcados con [tags] que el sistema reemplaza automáticamente
 
 **Validaciones de Generación**:
@@ -4088,15 +4009,13 @@ El documento debe seguir el formato estándar mostrado a continuación:
 **Reglas de Negocio para Generación de Documentos**:
 - **RN-15.11**: El documento solo puede generarse si todos los cálculos están completos
 - **RN-15.12**: Cada vez que se genera un documento, se crea una nueva versión si hubo cambios
-- **RN-15.13**: El documento Excel es la versión oficial para envío al cliente
+- **RN-15.13**: El documento pdf es la versión oficial para envío al cliente
 - **RN-15.14**: Una vez generado y enviado, el documento queda bloqueado para edición
-- **RN-15.15**: Una vez generado y enviado, el documento queda bloqueado para edición
 
 **Auditoría de Generación de Documentos**:
 - Fecha y hora de generación
 - Usuario que generó el documento
-- Versión del documento
-- Descarga del documento (quién y cuándo)
+- Versión del documento de cotización
 
 ### 15.5. Envío de Cotización a Clientes
 
@@ -4213,70 +4132,19 @@ Facility Manager
 - Gerente General
 - Gerente de FM
 - Jefe de Área solicitante
-- Controller (según monto)
 
-### 15.7. Gestión de FEE Adicional y Solicitud de Orden de Compra (OC)
 
-#### 15.7.1. Colocación de FEE Adicional (Paso 13 y 15)
-
-**Funcionalidad**:
-
-1. **FM coloca el FEE** (después de aprobación inicial):
-   - En algunos casos, después de la aprobación, FM debe ajustar o confirmar el FEE final
-   - Sistema muestra nuevamente el campo de margen de FEE contractual
-   - FM confirma o ajusta el FEE para la emisión de OC
-
-2. **Sistema muestra el campo de margen de FEE contractual**:
-   - Campo de referencia con el margen establecido en el contrato
-   - Validación automática de límites
-
-3. **FM coloca el FEE final**:
-   - FM ingresa el FEE definitivo
-   - Sistema recalcula el monto total si hubo ajustes
-
-4. **Sistema realiza el cálculo del FEE**:
-   - Cálculo final con el FEE confirmado
-   - Generación del monto definitivo para la OC
-
-#### 15.7.2. Envío de Cotización para Emisión de Orden de Compra (OC)
-
-**Proceso Final**:
-
-1. **FM envía cotización solicitando emisión de OC**:
-   - FM ejecuta acción "Solicitar Emisión de OC"
-   - Sistema genera formato de cotización para OC
-   - Incluye código de correlativo para OC
-
-2. **Generación de Formato de Cotización por Proveedor**:
-   - Sistema debe elaborar el formato de cotización por proveedor según formato predefinido
-   - Incluye todos los detalles de la cotización aprobada
-   - Monto final con FEE aplicado
-   - Términos y condiciones
-
-3. **Sistema envía solicitud al área de Compras/Procurement**:
-   - Notificación automática al área de Compras
-   - Adjunta cotización aprobada y formato para OC
-   - Compras procede con la emisión de la Orden de Compra
-
-4. **Trazabilidad**:
-   - Sistema registra fecha de solicitud de OC
-   - Estado cambia a "En Proceso de OC"
-   - Se crea vínculo entre cotización y OC
-
-### 15.8. Estados de la Cotización Formal
+### 15.7. Estados de la Cotización Formal
 
 | Estado | Descripción | Acciones Disponibles |
 |--------|-------------|----------------------|
 | **Pendiente** | Cotización creada pero no elaborada | Elaborar, Editar, Eliminar |
-| **En Elaboración** | FM está trabajando en la cotización | Editar, Guardar borrador, Enviar |
 | **Enviada** | Cotización enviada al cliente | Ver, Enviar recordatorio, Cancelar |
 | **Aprobada** | Cliente aprobó la cotización | Solicitar OC, Ver detalle |
 | **Rechazada** | Cliente rechazó la cotización | Ver motivo, Renegociar, Cerrar |
-| **En Proceso de OC** | Solicitud de OC enviada a Compras | Ver estado OC, Seguimiento |
-| **OC Emitida** | Orden de Compra generada | Ver OC, Imprimir, Archivar |
 | **Cancelada** | Cotización cancelada | Solo visualización |
 
-### 15.9. Campos del Formulario de Cotización Formal
+### 15.8. Campos del Formulario de Cotización Formal
 
 | Campo | Tipo | Obligatorio | Editable | Descripción |
 |-------|------|-------------|----------|-------------|
@@ -4309,14 +4177,9 @@ Facility Manager
 
 | Evento | Destinatarios | Medio | Tipo |
 |--------|---------------|-------|------|
-| Cotización elaborada | FM (confirmación) | Correo | Automático |
 | Cotización enviada a cliente | Cliente (externo/interno) | Correo | Automático |
-| Cotización aprobada | FM | Correo + Notificación interna | Automático |
-| Cotización rechazada | FM | Correo + Notificación interna | Automático |
-| Recordatorio de cotización pendiente | Cliente | Correo | Manual (FM) |
-| Solicitud de OC enviada | Área de Compras | Correo + Notificación interna | Automático |
-| OC emitida | FM + Cliente | Correo | Automático |
-
+| Cotización aprobada | FM, Supervisor, Service Desk | Correo + Notificación interna | Automático |
+| Cotización rechazada | FM, Supervisor, Service Desk | Correo + Notificación interna | Automático |
 ### 15.11. Validaciones del Módulo
 
 - El monto total de la cotización debe ser mayor a 0
@@ -4333,9 +4196,8 @@ Facility Manager
 
 - **RN-15.1**: El FM debe elaborar la cotización formal basándose en la cotización de proveedor aprobada
 - **RN-15.2**: Para clientes externos, el sistema debe validar que el FEE no exceda el margen FEE contractual
-- **RN-15.3**: Para clientes internos, el FEE es flexible pero requiere aprobación de Gerencia si supera el 50%
-- **RN-15.4**: El sistema debe calcular automáticamente el FEE, subtotal, IGV y monto total
-- **RN-15.5**: La cotización solo puede ser aprobada por el cliente o personal autorizado (según tipo de cliente)
+- **RN-15.3**: El sistema debe calcular automáticaente el FEE, subtotal, IGV y monto total
+- **RN-15.4**: La cotización solo puede ser aprobada por el cliente o personal autorizado (según tipo de cliente)
 - **RN-15.6**: Una vez aprobada la cotización, se debe generar la solicitud de OC automáticamente o manualmente según configuración
 - **RN-15.7**: Para obras menores, es obligatorio utilizar el formato especial LNT
 - **RN-15.8**: El sistema debe permitir el envío de recordatorios al cliente si no ha respondido en 3 días
@@ -4361,25 +4223,8 @@ Para servicios clasificados como "Obras Menores", el FM debe proporcionar un for
 - Validación obligatoria del archivo adjunto antes de envío
 - Plantilla descargable desde el sistema
 
-### 15.14. Integración con Módulo de Orden de Compra (OC)
 
-**Flujo de Integración**:
-
-1. **Cotización Aprobada** → Estado cambia a "Aprobada"
-2. **FM solicita emisión de OC** → Sistema genera formato de cotización por proveedor
-3. **Sistema envía solicitud a Compras** → Notificación automática con datos necesarios
-4. **Compras emite OC** → Código de OC se registra en la cotización
-5. **Vínculo Cotización-OC** → Trazabilidad completa del proceso
-
-**Datos Transferidos a la OC**:
-- Proveedor seleccionado
-- Monto total aprobado
-- Descripción y alcance del servicio
-- Plazo de ejecución
-- Términos de pago
-- Contacto del proveedor
-
-### 15.15. Auditoría del Módulo
+### 15.14. Auditoría del Módulo
 
 El sistema debe registrar en auditoría:
 
@@ -4397,7 +4242,7 @@ El sistema debe registrar en auditoría:
 - Accesos al detalle de la cotización
 - Descargas de documentos
 
-### 15.16. Reportes del Módulo
+### 15.15. Reportes del Módulo
 
 **Reportes Disponibles**:
 
