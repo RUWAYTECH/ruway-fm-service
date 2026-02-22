@@ -3331,7 +3331,9 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | **Tiempo de Entrega** | Numérico | Sí | Mayor a 0, en días | Días para completar servicio |
 | **Validez de Cotización** | Numérico | Sí | Mayor a 0, en días | Días de vigencia de la propuesta |
 | **Observaciones** | Texto libre | No | Máximo 500 caracteres | Comentarios adicionales |
-| **Items** | Nombres de item | No | Máximo 500 caracteres | *PENDIENTE DE DENIFIR EL FORMATO* |
+| **Items** | Nombres de item | No | Máximo 500 caracteres | El formato se defini en la siguiente imagen, el formulario debe pedir todo los campos |
+
+![Formato de Presupuesto](assets/formato-de-presupuesto.jpg)
 
 
 
@@ -3445,6 +3447,31 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | Cotización aprobada (incluye link programación) | Proveedor seleccionado | Correo | Automático |
 | Cotización rechazada (Opcional parametrizado para activar y inactivar la notificación) | Proveedores no seleccionados | Correo | Automático |
 | En caso que no se cuente con cotizaciones, Plazo de cotización próximo a vencer (24h) | Proveedores sin respuesta | Correo | Automático |
+
+```
+Nueva OT asignada
+
+ 
+
+Hola
+
+Se ha asignado una órden de trabajo en Fracttal.
+
+ 
+
+Id. de la OT: OT-170689
+Fecha de creación: 2026-02-03
+Generado por: Administrador Automático
+Responsable: PANORAMABPO (Victor Pichilingue Villarreal){*}
+Activos: EDIFICIO - SALA DE VENTAS (PISOS, PAREDES, OTROS) { A125-00013240-EG } 25102050-1
+
+Tareas: CALIDAD: Sticker instalado en el techo del ingreso de la tienda se encuentra despegándose.
+
+Puede realizar esta OT ingresando al módulo de Tareas > OTs > En Proceso
+
+
+```
+
 
 ### 12.8. Validaciones del Módulo de Cotización
 
