@@ -5627,7 +5627,7 @@ El sistema FM incluye 23 KPI's predefinidos:
 
 ### 20.5. Reglas de Negocio
 
-1. **Configuración de KPI's Nuevos**: Solo Gerente FM o Administrador pueden crear KPI's nuevos
+1. **Configuración de KPI's Nuevos**: Solo Gerente FM, FM, Administrador pueden crear KPI's nuevos
 2. **Acceso a Reportes**:
    - Gerente FM: Acceso total
    - Supervisor: KPI's de Equipos y Servicio (limitado a sus clientes/sedes)
