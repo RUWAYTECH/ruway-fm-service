@@ -3331,7 +3331,7 @@ Esta tabla define los términos clave que el sistema utiliza para clasificar sol
 | **Tiempo de Entrega** | Numérico | Sí | Mayor a 0, en días | Días para completar servicio |
 | **Validez de Cotización** | Numérico | Sí | Mayor a 0, en días | Días de vigencia de la propuesta |
 | **Observaciones** | Texto libre | No | Máximo 500 caracteres | Comentarios adicionales |
-| **Items** | Nombres de item | No | Máximo 500 caracteres | El formato se defini en la siguiente imagen, el formulario debe pedir todo los campos |
+| **Items** | Nombres de item | No | Máximo 500 caracteres | El formato se define en la siguiente imagen, el formulario debe pedir todo los campos del item|
 
 ![Formato de Presupuesto](assets/formato-de-presupuesto.jpg)
 
@@ -4308,174 +4308,43 @@ Gestionar el flujo completo de solicitud y emisión de Órdenes de Compra (OC) d
 
 ### 16.2. Flujo del Proceso
 
-#### 16.2.1. Inicio del Proceso
+   1. **Generar solicitud de OC**:
+      - La solicitud debe estar vinculada al Ticket del servicio
+      - La solicitud debe contener los siguientes documentos
+         1. #Eng + SOLPED
+         2. Sustento de ingreso y gasto.
+         3. Cotizacion aprobada por cliente y proveedor
 
-**Funcionalidad FM**: Sistema genera alerta automática
 
-- **Trigger**: Service Desk genera Código de Engagement en SQLPED
-- **Acción del Sistema**: FM detecta automáticamente la generación del engagement y notifica al Service Desk
-- **Notificación**: Correo automático al Service Desk informando que se ha generado un engagement válido en SQLPED
+   2. **Envío Automático**:
+      - El FM y service desk, envia la solcitud a Compras.
 
-#### 16.2.2. Validación de Datos y Documentos
 
-**Funcionalidad FM**: Service Desk adjunta información e ingresa al sistema
+#### 16.3. Recepción de solicitud de OC por parte de Compras
 
-1. **Captura de Datos**:
-   - Código de Engagement SQLPED
-   - Sustento de Ingresos y Gastos
-   - Cotización debidamente aprobada por cliente y proveedor
-   
-2. **Validación del Sistema**:
-   - Verifica que el código de engagement sea válido
-   - Confirma que la cotización esté aprobada
-   - Valida que todos los documentos obligatorios estén adjuntos
+   1. **Visualiza las OC  por estados**:
+      - Compras visualiza las solicitudes de OCS
+      - Tiene la posibilidad e aprobar o rechazar. En caso que sea rechazo debe ingresar un motivo.
 
-3. **Regla de Negocio**:
-   - Si tiene engagement SQLPED → Monto límite: 50,000 o más soles (contenido legal)
-   - Si NO tiene engagement SQLPED → Monto límite: 5000 a MÁS MM Y GOJO (solo Mantenimiento Mayor y Gastos Operativos de Obras)
+   2. **OC Aprobado**:
+      - En caso que este aprobado, debe adjuntar el formato PDF de la OC.
 
-**Notificación Simple** (no es funcionalidad FM directa):
-- Sistema valida que el documento tenga los documentos obligatorios adjuntos
-- **Acción**: Si NO están completos → Gateway de decisión: ¿Documentos obligatorios adjuntos?
-  - **NO**: Genera alerta y envía notificación al Service Desk para completar documentos
+   3. **Notificación a FM y Service Desk**:
+      - Cuando se aprueba y adjunte la OC se debe notificar a los involucrados en el flujo del proceso (FM y Service desk)
+   4. **Guardado automatico del Numero de OC**:
+      - Al adjuntar la OC de PDF el sistema debe de extraer el número de OC y guardar en un campo independiente dentro de la solicitud de OC.
 
-#### 16.2.3. Envío de Documentos a Compras
-
-**Funcionalidad FM**: Sistema envía documentos y notifica automáticamente
-
-1. **Proceso de Envío**:
-   - Sistema compila todos los documentos: Engagement, Cotización, Sustentos
-   - Genera paquete de información completo
-   - Adjunta enlace de ingreso al sistema para consulta
-
-2. **Envío Automático**:
-   - Sistema envía correo a Compras con:
-     - Documentos adjuntos comprimidos
-     - Enlace directo al sistema FM
-     - Resumen de la solicitud (Monto, Proveedor, Plazo)
-
-3. **Notificación**:
-   - Compras recibe correo con alerta de nueva solicitud de OC
-   - Notificación incluye prioridad según monto
-
-#### 16.2.4. Generación de Orden de Compra
-
-**Notificación Simple** (no es funcionalidad FM directa):
-- Compras genera la OC en su sistema CSC
-- FM recibe notificación de que la OC ha sido creada
-
-**Funcionalidad FM**: Sistema registra y actualiza estado
-
-1. **Registro de OC**:
-   - Sistema muestra pantalla de consulta de estado
-   - Compras comparte código de OC generado
-   - Sistema actualiza estado de la solicitud: "OC Generada"
-
-2. **Auditoría**:
-   - Sistema registra:
-     - Fecha y hora de generación de OC
-     - Código de OC
-     - Usuario de Compras que generó
-     - Documentos asociados
-
-#### 16.2.5. Selecciones CSC y Emisión Final
-
-**Notificación Simple** (no es funcionalidad FM directa):
-- Compras realiza selecciones internas en CSC (aprobaciones, revisiones)
-- Genera las OC definitivas con todas las aprobaciones
-
-**Funcionalidad FM**: Sistema recibe y procesa confirmación
-
-1. **Recepción de OC Definitiva**:
-   - Sistema solicita permiso para acceder a los archivos
-   - Usuario autoriza acceso al sistema
-   - Sistema descarga y almacena OC en formato PDF
-
-2. **Validación de Formatos**:
-   - Sistema valida que el archivo sea PDF
-   - Verifica integridad del documento
-   - Confirma que contenga código de OC válido
-
-#### 16.2.6. Compra OC y Envío al Proveedor
-
-**Funcionalidad FM**: Sistema emite OC y notifica
-
-1. **Generación de Compra CSC**:
-   - Sistema compara CSC, selecciona y emite la OC definitiva
-   - Almacena OC en repositorio del sistema
-
-2. **Emisión al Proveedor**:
-   - Sistema envía OC como PdfService Chile
-   - Notificación automática al proveedor vía correo
-   - Enlace para descarga de OC
-   - Confirmación de recepción requerida
-
-#### 16.2.7. Notificación Final al Service Desk
-
-**Funcionalidad FM**: Sistema notifica cierre del proceso
-
-1. **Service Desk revisa la OC**:
-   - Sistema notifica a Service Desk que OC ha sido enviada al proveedor
-   - Service Desk puede consultar estado en tiempo real
-
-2. **Cierre del Proceso**:
-   - Sistema registra fecha y hora de envío al proveedor
-   - Estado final: "OC Enviada a Proveedor"
-   - Proceso completo registrado en auditoría
-
-**Notificación Simple**:
-- Sistema envía correo al proveedor confirmando envío de OC
-- Requiere confirmación de recepción
-
-### 16.3. Estados de la Orden de Compra
-
-El sistema debe gestionar los siguientes estados:
-
-1. **Engagement Generado**: SQLPED genera código de engagement
-2. **Documentos en Validación**: Service Desk adjunta información
-3. **Documentos Incompletos**: Falta documentación obligatoria (Alerta)
-4. **Enviado a Compras**: Paquete completo enviado al área de Compras
-5. **OC en Proceso**: Compras está generando la OC
-6. **OC Generada**: Compras creó OC en CSC
-7. **Selecciones CSC en Proceso**: Aprobaciones internas de Compras
-8. **OC Definitiva Generada**: OC final con todas las aprobaciones
-9. **OC Enviada a Proveedor**: Proveedor recibe OC vía PdfService
-10. **Proceso Finalizado**: Proveedor confirma recepción
-
-### 16.4. Pantallas del Módulo
-
-#### 16.4.1. Pantalla de Solicitud de OC
-
-**Campos**:
-- Código de Engagement SQLPED (obligatorio)
-- Adjuntar Sustento de Ingresos y Gastos (obligatorio)
-- Adjuntar Cotización Aprobada (obligatorio, archivo)
-- Monto Total (calculado desde cotización)
-- Proveedor Seleccionado (desde cotización)
-- Observaciones (opcional)
-
-**Validaciones**:
-- Código de engagement debe existir en SQLPED
-- Monto debe cumplir reglas según tenga o no engagement
-- Cotización debe estar en estado "Aprobada por Cliente"
-- Todos los documentos obligatorios deben estar adjuntos
-
-**Botones**:
-- Guardar como Borrador
-- Enviar a Compras (solo si validaciones pasan)
-- Cancelar
-
-#### 16.4.2. Pantalla de Seguimiento de OC
+#### 16.3. Pantalla de Seguimiento de OC
 
 **Información Mostrada**:
-- Código de Solicitud (generado por FM)
-- Código de Engagement SQLPED
+- Código de Ticket
+- Código de Engagement SOLPED
 - Estado Actual (con indicador visual)
 - Fecha de Solicitud
 - Monto Total
 - Proveedor
 - Cliente
-- Código de OC (cuando Compras lo genere)
+- Código de OC (Automatico con OCR)
 - Fecha de Emisión de OC
 - Documentos Asociados (con opción de descarga)
 
@@ -4492,158 +4361,9 @@ El sistema debe gestionar los siguientes estados:
 - Ver Auditoría
 - Imprimir Resumen
 
-#### 16.4.3. Pantalla de Registro de OC (Compras)
 
-**Campos** (solo accesible para rol Compras):
-- Código de Solicitud FM (solo lectura)
-- Código de OC CSC (obligatorio)
-- Fecha de Generación (automática)
-- Observaciones de Compras (opcional)
-- Adjuntar OC Definitiva PDF (obligatorio)
 
-**Validaciones**:
-- Código de OC debe ser único
-- Archivo debe ser formato PDF
-- Tamaño máximo: 10 MB
-
-**Botones**:
-- Registrar OC
-- Cancelar
-
-### 16.5. Notificaciones Automáticas
-
-#### 16.5.1. Notificación: Engagement Generado
-- **Destinatarios**: Service Desk FM
-- **Trigger**: Sistema detecta nuevo engagement en SQLPED
-- **Contenido**:
-  - Código de Engagement
-  - Fecha de Generación
-  - Enlace al sistema para adjuntar documentos
-
-#### 16.5.2. Notificación: Documentos Incompletos
-- **Destinatarios**: Service Desk FM
-- **Trigger**: Validación detecta falta de documentos
-- **Contenido**:
-  - Lista de documentos faltantes
-  - Enlace para completar información
-  - Alerta de urgencia
-
-#### 16.5.3. Notificación: Solicitud Enviada a Compras
-- **Destinatarios**: Área de Compras
-- **Trigger**: Service Desk envía solicitud completa
-- **Contenido**:
-  - Código de Solicitud
-  - Resumen de la solicitud (Proveedor, Monto, Cliente)
-  - Documentos adjuntos (ZIP)
-  - Enlace al sistema FM
-  - Plazo sugerido de respuesta
-
-#### 16.5.4. Notificación: OC Generada
-- **Destinatarios**: Service Desk FM, Gerente FM
-- **Trigger**: Compras registra código de OC
-- **Contenido**:
-  - Código de OC CSC
-  - Código de Solicitud FM
-  - Fecha de Generación
-  - Enlace para consulta
-
-#### 16.5.5. Notificación: OC Enviada a Proveedor
-- **Destinatarios**: Proveedor, Service Desk FM
-- **Trigger**: Sistema envía OC definitiva
-- **Contenido** (Proveedor):
-  - OC en formato PDF
-  - Código de OC
-  - Instrucciones de confirmación
-  - Enlace para descargar
-  - Datos de contacto FM
-
-**Contenido** (Service Desk):
-  - Confirmación de envío
-  - Proveedor destinatario
-  - Fecha y hora de envío
-
-### 16.6. Reglas de Negocio
-
-#### 16.6.1. Montos y Engagements
-
-1. **Con Engagement SQLPED**:
-   - Monto mínimo: 50,000 soles
-   - Requiere: Contenido legal obligatorio
-   - Tipo: Compras de alto valor
-
-2. **Sin Engagement SQLPED**:
-   - Rango: 5,000 a MÁS soles
-   - Solo aplica para: Mantenimiento Mayor (MM) y Gastos Operativos de Obras (GOJO)
-   - Documentación simplificada
-
-#### 16.6.2. Validación de Documentos Obligatorios
-
-**Documentos Requeridos**:
-1. Código de Engagement SQLPED válido (si aplica según monto)
-2. Sustento de Ingresos y Gastos (obligatorio)
-3. Cotización aprobada por cliente y proveedor (obligatorio)
-
-**Regla**: Sistema NO permite envío a Compras si falta algún documento obligatorio
-
-#### 16.6.3. Formatos Permitidos
-
-- **Cotización**: PDF (máx. 10 MB)
-- **Sustento de Ingresos y Gastos**: PDF, Excel (máx. 5 MB)
-- **OC Definitiva**: Solo PDF (máx. 10 MB)
-
-### 16.7. Integraciones
-
-#### 16.7.1. Integración con SQLPED
-
-**Tipo**: Lectura automática
-**Frecuencia**: Tiempo real o cada 5 minutos
-**Datos Obtenidos**:
-- Código de Engagement
-- Fecha de Generación
-- Estado del Engagement
-- Monto Asociado
-
-**Acción del Sistema**:
-- Detecta nuevo engagement
-- Genera notificación automática
-- Actualiza base de datos FM
-
-#### 16.7.2. Integración con Sistema de Compras (CSC)
-
-**Tipo**: Bidireccional
-**Datos Enviados a CSC**:
-- Código de Solicitud FM
-- Proveedor
-- Monto Total
-- Documentos (ZIP)
-- Plazo Sugerido
-
-**Datos Recibidos desde CSC**:
-- Código de OC
-- Estado de OC
-- Fecha de Generación
-- OC Definitiva (PDF)
-
-#### 16.7.3. Integración con PdfService Chile
-
-**Tipo**: Envío de documentos
-**Uso**: Emisión de OC al proveedor
-**Funcionalidad**:
-- Envío seguro de PDF
-- Confirmación de entrega
-- Registro de trazabilidad
-
-### 16.8. Permisos por Rol
-
-| Rol | Ver Solicitudes | Crear Solicitud | Registrar OC | Enviar a Proveedor | Ver Auditoría |
-|-----|----------------|-----------------|--------------|-------------------|---------------|
-| Gerente General | Sí | No | No | No | Sí |
-| Gerente FM | Sí | No | No | Sí | Sí |
-| Service Desk FM | Sí | Sí | No | No | No |
-| Compras | Sí | No | Sí | No | No |
-| Proveedor | Solo sus OC | No | No | No | No |
-
-### 16.9. Auditoría del Módulo
+### 16.4. Auditoría del Módulo
 
 El sistema debe registrar:
 
@@ -4681,9 +4401,9 @@ El sistema debe registrar:
    - Usuario responsable del cambio
    - Estado anterior y nuevo estado
 
-### 16.10. Reportes del Módulo
+### 16.5. Reportes del Módulo
 
-#### 16.10.1. Reporte de Solicitudes de OC
+#### 16.5.1. Reporte de Solicitudes de OC
 
 **Filtros**:
 - Período (fecha inicio - fecha fin)
@@ -4705,7 +4425,7 @@ El sistema debe registrar:
 
 **Exportable a**: Excel, PDF
 
-#### 16.10.2. Reporte de Tiempo de Proceso
+#### 16.5.2. Reporte de Tiempo de Proceso
 
 **Análisis**:
 - Tiempo promedio desde solicitud hasta OC generada
@@ -4724,7 +4444,7 @@ El sistema debe registrar:
 - Diagrama de barras por etapa
 - Tendencia mensual de tiempos
 
-#### 16.10.3. Reporte de OC por Proveedor
+#### 16.5.3. Reporte de OC por Proveedor
 
 **Filtros**:
 - Proveedor
@@ -4740,91 +4460,6 @@ El sistema debe registrar:
 
 **Exportable a**: Excel, PDF
 
-#### 16.10.4. Reporte de Documentos Faltantes
-
-**Objetivo**: Identificar solicitudes con documentación incompleta
-
-**Datos Mostrados**:
-- Código de Solicitud
-- Fecha de Creación
-- Documentos Faltantes
-- Responsable (Service Desk)
-- Días pendiente
-- Estado
-
-**Acción**: Permite enviar recordatorio masivo
-
-### 16.11. Alertas del Sistema
-
-#### 16.11.1. Alerta: Nuevo Engagement Detectado
-- **Tipo**: Notificación automática
-- **Destinatario**: Service Desk FM
-- **Urgencia**: Normal
-- **Acción Requerida**: Adjuntar documentos obligatorios
-
-#### 16.11.2. Alerta: Documentos Incompletos
-- **Tipo**: Advertencia
-- **Destinatario**: Service Desk FM
-- **Urgencia**: Alta
-- **Acción Requerida**: Completar documentación
-
-#### 16.11.3. Alerta: Solicitud Pendiente en Compras
-- **Tipo**: Recordatorio
-- **Destinatario**: Área de Compras
-- **Frecuencia**: Cada 2 días si no hay avance
-- **Acción Requerida**: Generar OC
-
-#### 16.11.4. Alerta: OC Sin Enviar a Proveedor
-- **Tipo**: Recordatorio
-- **Destinatario**: Gerente FM
-- **Frecuencia**: Si pasan más de 3 días desde generación de OC
-- **Acción Requerida**: Autorizar envío a proveedor
-
-### 16.12. Validaciones Adicionales
-
-1. **Código de Engagement**:
-   - Debe existir en sistema SQLPED
-   - Debe estar activo
-   - No debe estar asociado a otra solicitud de OC
-
-2. **Cotización**:
-   - Debe estar en estado "Aprobada"
-   - Debe tener proveedor seleccionado
-   - Monto debe coincidir con el sustento
-
-3. **Monto vs Engagement**:
-   - Si monto ≥ 50,000 → Debe tener engagement SQLPED
-   - Si monto < 50,000 y es MM o GOJO → Puede NO tener engagement
-   - Si no cumple reglas → Sistema rechaza
-
-4. **Documentos**:
-   - Tamaño máximo por archivo: 10 MB
-   - Formatos permitidos según tipo de documento
-   - No se permiten documentos corruptos o ilegibles
-
-### 16.13. Consideraciones Técnicas
-
-1. **Almacenamiento de Documentos**:
-   - Documentos deben almacenarse en repositorio seguro
-   - Backup automático diario
-   - Retención mínima: 7 años
-
-2. **Seguridad**:
-   - Encriptación de documentos sensibles
-   - Control de acceso por rol
-   - Registro de todos los accesos a documentos
-
-3. **Performance**:
-   - Carga de documentos: máximo 30 segundos por archivo
-   - Consulta de estado: tiempo de respuesta < 2 segundos
-   - Generación de reportes: máximo 1 minuto
-
-4. **Disponibilidad**:
-   - Sistema debe estar disponible 24/7
-   - Mantenimientos programados fuera de horario laboral
-   - Notificación previa de mantenimientos
-
----
 
 ## 17. EMISION DE ORDEN DE COMPRA PARA GASTOS
 
@@ -4832,35 +4467,6 @@ El sistema debe registrar:
 
 Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos operativos, garantizando la trazabilidad desde la generación del engagement en SQLPED hasta la notificación al proveedor y el registro del parte de ingresos. El sistema debe automatizar validaciones, notificaciones y el flujo de información entre Service Desk, FM, Compras CSC y Proveedores.
 
-### 17.2. Flujo del Proceso
-
-#### 17.2.1. Generación de Engagement en SQLPED
-
-**Funcionalidad FM**: Sistema detecta y registra engagement
-
-**Proceso**:
-
-1. **Service Desk genera Código de Engagement en SQLPED**:
-   - Service Desk emite el código de engagement en el sistema SQLPED
-   - Sistema SQLPED valida y genera código único
-   - Engagement queda registrado con sus datos asociados
-
-2. **Sistema FM detecta nuevo Engagement**:
-   - Sistema FM monitorea automáticamente SQLPED
-   - Detecta nuevo engagement generado
-   - Registra automáticamente en base de datos FM
-
-3. **Notificación Automática**:
-   - Sistema genera notificación automática al Service Desk
-   - Correo confirmando que el engagement fue detectado por FM
-   - Se habilita el proceso de carga de documentos
-
-**Datos Capturados del Engagement**:
-- Código de Engagement SQLPED
-- Fecha de generación
-- Monto asociado
-- Tipo de servicio
-- Estado del engagement
 
 #### 17.2.2. Validación de Documentos Obligatorios
 
@@ -4869,7 +4475,7 @@ Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos
 **Proceso**:
 
 1. **Service Desk adjunta información al sistema**:
-   - Código de Engagement SQLPED (obligatorio)
+   - Código de Engagement SOLPED (obligatorio)
    - Sustento de Ingresos y Gastos (obligatorio)
    - Cotización aprobada por cliente y proveedor (obligatorio)
 
@@ -4885,12 +4491,6 @@ Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos
    - Formatos de archivos deben ser válidos (PDF, Excel según tipo)
    - Cotización debe estar en estado "Aprobada"
 
-4. **Gateway de Decisión: ¿Documentos obligatorios adjuntos?**:
-   - **SÍ**: Sistema permite continuar al siguiente paso
-   - **NO**: Sistema genera alerta y notifica a Service Desk
-     - Detalla qué documentos faltan
-     - Bloquea el avance hasta completar documentación
-     - Envía correo de recordatorio
 
 **Reglas de Validación**:
 - Documentos en formato PDF (máximo 10 MB por archivo)
@@ -4924,7 +4524,7 @@ Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos
 4. **Notificación de Aprobaciones**:
    - Sistema notifica a cada aprobador en cadena
    - Envío automático a siguiente nivel tras cada aprobación
-   - Alerta si aprobación está pendiente más de 24 horas
+
 
 #### 17.2.4. Envío de Datos a Compras CSC
 
@@ -4971,14 +4571,13 @@ Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos
 
 2. **Compras CSC sube la OC al sistema FM**:
    - Compras accede al módulo de registro de OC en FM
-   - Ingresa código de OC CSC
+   - El codigo de OC se guarda de forma automatica mediante el servicio de OCR
    - Adjunta archivo PDF de la OC definitiva
    - Registra fecha de emisión
 
 3. **Validación del Sistema FM**:
    - Verifica que el archivo sea formato PDF
    - Valida que el código de OC sea único
-   - Confirma que contenga firma digital o sello de Compras
    - Tamaño máximo: 10 MB
 
 4. **Sistema almacena la OC**:
@@ -4986,7 +4585,6 @@ Gestionar el proceso completo de emisión de Órdenes de Compra (OC) para gastos
    - Se vincula automáticamente con el engagement correspondiente
    - Estado cambia a "OC Generada"
 
----
 
 #### 17.2.5.1. Validación Especial: Venta Empresa
 
@@ -5112,6 +4710,8 @@ El sistema debe procesar automáticamente las cotizaciones recibidas por correo 
 - Usuario técnico ya realizó su compra mensual autorizada
 - Acumulado mensual del usuario supera el límite configurado
 
+**Nota: El Monto debe ser parametrizado en la tabla de configuraciones del sistema**
+
 ##### 4. Proceso de Aprobación Manual (cuando se exceden límites)
 
 **Funcionalidad**: Sistema solicita aprobación del FM validador
@@ -5126,7 +4726,6 @@ El sistema debe procesar automáticamente las cotizaciones recibidas por correo 
    
    **Notificación mediante Llamada Automática** (opcional según configuración):
    - Sistema realiza llamada automática al FM aprobador
-   - Mensaje de voz: "Tiene una solicitud de aprobación de Venta Empresa pendiente"
    - Informa: Número de cotización, monto, usuario solicitante
 
    **Notificación por WhatsApp**:
@@ -5385,18 +4984,11 @@ El sistema debe procesar automáticamente las cotizaciones recibidas por correo 
 - Tasa de aprobación vs rechazo
 - Exportable a Excel
 
-**Reporte 3: Compras por Empresa Proveedora**
-- Total de compras por cada empresa proveedora registrada
-- Comparativa entre empresas (ej: Sodimac vs Promart vs Maestro)
-- Sucursales más frecuentes por empresa
-- Productos más solicitados por empresa
-- Comparativa de montos por empresa
-- Exportable a Excel
 
 **Reporte 4: Tendencias Mensuales**
 - Evolución de compras mes a mes
 - Tendencia de montos
-- Usuarios más activos
+- Usuarios con mayor compras
 - Gráficos de tendencia
 
 ##### 11. Auditoría de Venta Empresa
@@ -5411,49 +5003,16 @@ El sistema debe registrar:
 - Fecha y hora de aprobación/rechazo
 - Motivo de rechazo (si aplica)
 - Correo de aprobación enviado (fecha, destinatario)
-- Correos adjuntados al código de servicio
-- Cambios de configuración de parámetros
-- Accesos al panel de Venta Empresa
-- Descargas de reportes
 
-#### 17.2.6. Sistema Notifica a FM
 
-**Funcionalidad FM**: Notificación automática de OC generada
+#### 17.2.6. Envío de Documentación al Proveedor vía Email
 
-**Proceso**:
-
-1. **Sistema detecta que OC ha sido cargada**:
-   - Trigger automático al registrar OC en sistema
-   - Sistema genera notificación inmediata
-
-2. **El Sistema notifica a FM**:
-   - Correo automático a FM con:
-     - Código de OC CSC generado
-     - Código de Engagement asociado
-     - Monto de la OC
-     - Proveedor
-     - Enlace para descargar OC en PDF
-     - Estado actual
-
-3. **FM recibe notificación**:
-   - FM puede visualizar la OC desde el sistema
-   - Tiene acceso a descargar el PDF
-   - Puede consultar detalles completos
-
-4. **Registro de Notificación**:
-   - Sistema registra fecha y hora de envío
-   - Confirma lectura de correo
-   - Registra accesos a la OC
-
-#### 17.2.7. Envío de Documentación al Proveedor vía Email
-
-**Funcionalidad FM**: Sistema envía OC al proveedor automáticamente
+**Funcionalidad FM**: Service Desk o FM  envía OC al proveedor
 
 **Proceso**:
 
 1. **Sistema prepara el envío al proveedor**:
-   - Genera formato PDF de la OC
-   - Compila documentos adicionales si corresponde
+   - Envia el PDF de la OC
    - Prepara correo con plantilla predefinida
 
 2. **Sistema envía la documentación vía email al proveedor**:
@@ -5489,102 +5048,21 @@ Atentamente,
 Panorama BPO
 ```
 
-3. **Notificación de Envío**:
-   - Sistema notifica a FM que OC fue enviada al proveedor
-   - Registra fecha y hora de envío
-   - Estado cambia a "OC Enviada a Proveedor"
-
-#### 17.2.8. Sistema Envía Documentación al Proveedor en el Sistema
-
-**Funcionalidad FM**: Portal de Proveedores recibe OC
-
-**Proceso**:
-
-1. **Sistema habilita OC en Portal de Proveedores**:
-   - OC queda disponible en portal del proveedor
-   - Proveedor accede con sus credenciales
-   - Visualiza OC completa con todos los detalles
-
-2. **Proveedor revisa la OC en el sistema**:
-   - Descarga PDF de la OC
-   - Revisa términos y condiciones
-   - Consulta detalle del servicio solicitado
-
-3. **Proveedor confirma recepción y aceptación**:
-   - Proveedor hace clic en "Confirmar Recepción"
-   - Sistema solicita confirmación de aceptación de términos
-   - Proveedor ingresa observaciones (opcional)
-
-4. **Sistema registra confirmación**:
-   - Fecha y hora de confirmación del proveedor
-   - Usuario del proveedor que confirmó
-   - Estado cambia a "OC Confirmada por Proveedor"
-
-5. **Notificación de Confirmación**:
-   - Sistema notifica a FM que proveedor confirmó OC
-   - Sistema notifica a Compras CSC
-   - Se registra en auditoría
-
-#### 17.2.9. Generación de Parte de Ingresos
-
-**Funcionalidad FM**: Relación OC con Parte de Ingresos
-
-**Proceso**:
-
-1. **Sistema relaciona OC con Parte de Ingresos**:
-   - Una vez confirmada la OC por el proveedor
-   - Sistema genera automáticamente correlación: **OC = Parte de Ingresos**
-   - Código de Parte de Ingresos se genera basado en código de OC
-
-2. **Registro de Parte de Ingresos**:
-   - Sistema crea registro de Parte de Ingresos
-   - Vincula con OC correspondiente
-   - Estado inicial: "Pendiente de Ingreso"
-
-3. **Información del Parte de Ingresos**:
-   - Código de OC CSC
-   - Código de Parte de Ingresos (autogenerado)
-   - Proveedor
-   - Monto esperado
-   - Fecha estimada de ingreso
-   - Descripción de productos/servicios
-
-4. **Notificación**:
-   - Sistema notifica a Logística/Almacén
-   - Notifica a FM sobre parte de ingreso generado
-   - Queda en espera de recepción física
-
-### 17.3. Estados de la Orden de Compra para Gastos
-
-El sistema debe gestionar los siguientes estados:
-
-1. **Engagement Detectado**: Sistema FM detectó engagement en SQLPED
-2. **Documentos en Carga**: Service Desk está adjuntando documentación
-3. **Documentos Incompletos**: Falta documentación obligatoria (Alerta)
-4. **En Validación FM**: FM está revisando documentos
-5. **En Proceso de Aprobación**: Esperando aprobaciones según nivel
-6. **Aprobado**: Todas las aprobaciones obtenidas
-7. **Enviado a Compras**: Información enviada a Compras CSC
-8. **OC en Proceso CSC**: Compras está generando OC
-9. **OC Generada**: Compras cargó OC en sistema FM
-10. **OC Enviada a Proveedor**: OC enviada vía email y portal
-11. **OC Confirmada por Proveedor**: Proveedor aceptó OC
-12. **Parte de Ingresos Generado**: Sistema generó parte de ingresos
-13. **Proceso Finalizado**: OC completada y cerrada
-
 ### 17.4. Pantallas del Módulo
 
 #### 17.4.1. Pantalla de Registro de Engagement y Documentos
 
 **Campos**:
 - Código de Engagement SQLPED (obligatorio, validado con SQLPED)
-- Fecha de Generación Engagement (solo lectura, automático)
-- Monto del Engagement (solo lectura, automático desde SQLPED)
 - Tipo de Servicio (lista desplegable)
 - Adjuntar Sustento de Ingresos y Gastos (obligatorio, PDF/Excel)
 - Adjuntar Cotización Aprobada (obligatorio, PDF)
 - Proveedor (desde cotización, solo lectura)
 - Observaciones (opcional, texto libre)
+Antes de enviar al proveedor debe tener las siguientes opciones para completar el Service Desk o FM
+   - Términos de Pago
+   - Condiciones Especiales
+   - Contacto de Compras
 
 **Validaciones**:
 - Código de engagement debe existir en SQLPED
@@ -5703,90 +5181,6 @@ El sistema debe gestionar los siguientes estados:
 - Sistema envía recordatorio si no confirma en 24 horas
 - Aceptación de términos es obligatoria para continuar
 
-### 17.5. Notificaciones Automáticas
-
-#### 17.5.1. Notificación: Engagement Detectado
-- **Destinatarios**: Service Desk FM
-- **Trigger**: Sistema detecta nuevo engagement en SQLPED
-- **Contenido**:
-  - Código de Engagement
-  - Monto asociado
-  - Enlace para cargar documentos
-  - Lista de documentos obligatorios
-
-#### 17.5.2. Notificación: Documentos Incompletos
-- **Destinatarios**: Service Desk FM
-- **Trigger**: FM solicita correcciones o faltan documentos
-- **Contenido**:
-  - Código de Solicitud
-  - Lista de documentos faltantes o con errores
-  - Observaciones de FM
-  - Enlace para completar
-
-#### 17.5.3. Notificación: Aprobación Pendiente
-- **Destinatarios**: Aprobadores (Gerente FM, Gerente General según nivel)
-- **Trigger**: Solicitud enviada a aprobación
-- **Contenido**:
-  - Código de Solicitud
-  - Monto a aprobar
-  - Proveedor
-  - Enlace para revisar y aprobar
-  - Resumen de documentos
-
-#### 17.5.4. Notificación: Solicitud Aprobada y Enviada a Compras
-- **Destinatarios**: Área de Compras CSC
-- **Trigger**: Solicitud aprobada y enviada
-- **Contenido**:
-  - Código de Solicitud FM
-  - Código de Engagement
-  - Proveedor
-  - Monto autorizado
-  - Documentos adjuntos (ZIP)
-  - Enlace al sistema FM
-  - Plazo sugerido de emisión de OC
-
-#### 17.5.5. Notificación: OC Generada
-- **Destinatarios**: FM, Service Desk, Gerente FM
-- **Trigger**: Compras registra OC en sistema
-- **Contenido**:
-  - Código de OC CSC
-  - Código de Solicitud FM
-  - Código de Engagement
-  - Fecha de Emisión
-  - Monto OC
-  - Enlace para descargar OC
-
-#### 17.5.6. Notificación: OC Enviada a Proveedor
-- **Destinatarios**: Proveedor
-- **Trigger**: Sistema envía OC
-- **Contenido**:
-  - Código de OC
-  - Monto
-  - Descripción del servicio
-  - OC en PDF adjunta
-  - Enlace al portal de proveedores
-  - Instrucciones de confirmación
-  - Plazo para confirmar recepción
-
-#### 17.5.7. Notificación: Proveedor Confirmó OC
-- **Destinatarios**: FM, Compras CSC
-- **Trigger**: Proveedor confirma recepción y aceptación
-- **Contenido**:
-  - Código de OC
-  - Proveedor
-  - Fecha y hora de confirmación
-  - Observaciones del proveedor (si las hay)
-
-#### 17.5.8. Notificación: Parte de Ingresos Generado
-- **Destinatarios**: Logística/Almacén, FM
-- **Trigger**: Sistema genera parte de ingresos
-- **Contenido**:
-  - Código de Parte de Ingresos
-  - Código de OC asociado
-  - Proveedor
-  - Descripción de productos/servicios
-  - Fecha estimada de ingreso
-  - Enlace para registrar recepción
 
 ### 17.6. Reglas de Negocio
 
@@ -5826,316 +5220,27 @@ El sistema debe gestionar los siguientes estados:
    - Aprobación: FM + Gerente FM + Gerente General
    - Tiempo máximo: 72 horas
 
-**Regla**: Si se excede el tiempo, sistema envía escalamiento automático
+**Regla**: El sistema debe notificar en caso que superan el tiempo establecido para su aprobación. 
 
 #### 17.6.4. Confirmación de Proveedor
 
 - Proveedor debe confirmar recepción en máximo 48 horas
 - Sistema envía recordatorio a las 24 horas
 - Si no confirma en 48 horas, sistema alerta a FM
-- FM puede marcar como "Confirmada manualmente" con justificación
 
 #### 17.6.5. Generación de Parte de Ingresos
 
-- Sistema genera automáticamente parte de ingresos al confirmar OC
+- Service Desk solicita el parte de ingresos al confirmar OC + Guia de Remisión
 - Relación 1:1 entre OC y Parte de Ingresos
 - Código de Parte de Ingresos formato: PI-[AñoMes]-[Correlativo]
 - Parte de Ingresos queda pendiente hasta recepción física
 
 #### 17.6.6. Formatos Permitidos
 
-- **Sustento de Ingresos y Gastos**: PDF, Excel (máx. 5 MB)
+- **Sustento de Ingresos y Gastos**: PDF (máx. 5 MB)
 - **Cotización**: PDF (máx. 10 MB)
 - **OC Definitiva**: Solo PDF (máx. 10 MB)
 
-### 17.7. Integraciones
-
-#### 17.7.1. Integración con SQLPED
-
-**Tipo**: Lectura automática en tiempo real
-
-**Frecuencia**: Cada 5 minutos o en tiempo real (webhook)
-
-**Datos Obtenidos**:
-- Código de Engagement
-- Fecha de Generación
-- Monto Asociado
-- Estado del Engagement
-- Tipo de Servicio
-- Cliente/Sede
-
-**Acción del Sistema**:
-- Detecta nuevo engagement
-- Valida que no esté duplicado
-- Genera notificación automática
-- Actualiza base de datos FM
-- Crea registro de solicitud inicial
-
-#### 17.7.2. Integración con Sistema de Compras (CSC)
-
-**Tipo**: Bidireccional
-
-**FM → CSC** (envío de solicitudes):
-- Código de Engagement
-- Documentos obligatorios
-- Aprobaciones obtenidas
-- Datos del proveedor
-- Monto autorizado
-
-**CSC → FM** (respuesta con OC):
-- Código de OC CSC
-- Fecha de Emisión
-- OC en formato PDF
-- Estado de la OC
-- Términos y condiciones
-
-**Método de Integración**:
-- API REST o SOAP
-- Autenticación OAuth 2.0
-- Notificaciones mediante webhooks
-- Backup manual si API no disponible
-
-#### 17.7.3. Integración con Portal de Proveedores
-
-**Tipo**: Publicación automática
-
-**Datos Publicados**:
-- OC completa en PDF
-- Términos y condiciones
-- Instrucciones de confirmación
-- Contactos de Compras
-
-**Funcionalidades**:
-- Descarga de OC
-- Confirmación de recepción
-- Aceptación de términos
-- Carga de observaciones
-
-### 17.8. Auditoría del Módulo
-
-El sistema debe registrar en auditoría:
-
-- Fecha y hora de detección de engagement
-- Usuario (Service Desk) que cargó documentos
-- Cambios en documentos adjuntos
-- Usuario (FM) que validó documentos
-- Aprobadores y fechas de cada aprobación
-- Fecha de envío a Compras CSC
-- Usuario (Compras) que cargó OC
-- Fecha de envío de OC a proveedor
-- Fecha y hora de confirmación del proveedor
-- Generación de parte de ingresos
-- Accesos a documentos (quién y cuándo)
-- Descargas de OC (usuario, fecha, hora)
-- Modificaciones de estado
-- Notificaciones enviadas (destinatario, fecha, hora)
-
-### 17.9. Reportes del Módulo
-
-#### 17.9.1. Reporte de OC por Estado
-
-**Filtros**:
-- Estado
-- Rango de Fechas
-- Proveedor
-- Rango de Monto
-
-**Datos Mostrados**:
-- Código de Solicitud FM
-- Código de Engagement
-- Código de OC CSC
-- Estado Actual
-- Proveedor
-- Monto
-- Días en Proceso
-- Responsable Actual
-
-**Exportable a**: Excel, PDF
-
-#### 17.9.2. Reporte de Tiempo de Proceso
-
-**Análisis**:
-- Tiempo promedio desde engagement hasta OC generada
-- Tiempo promedio desde OC generada hasta confirmación de proveedor
-- Identificación de cuellos de botella por etapa
-
-**Datos Mostrados**:
-- Etapa del Proceso
-- Tiempo Promedio
-- Tiempo Mínimo
-- Tiempo Máximo
-- Cantidad de Casos
-- Porcentaje del Total
-
-**Gráficos**:
-- Diagrama de barras por etapa
-- Tendencia mensual de tiempos
-- Comparativa por proveedor
-
-#### 17.9.3. Reporte de Aprobaciones Pendientes
-
-**Filtros**:
-- Aprobador
-- Rango de Montos
-- Antigüedad (días pendientes)
-
-**Datos Mostrados**:
-- Código de Solicitud
-- Fecha de Solicitud
-- Monto
-- Proveedor
-- Aprobador Pendiente
-- Días Pendiente
-- Nivel de Urgencia
-
-**Acciones**:
-- Enviar recordatorio individual
-- Enviar recordatorio masivo
-- Escalar a superior
-
-#### 17.9.4. Reporte de OC por Proveedor
-
-**Filtros**:
-- Proveedor
-- Período
-- Estado
-
-**Datos Mostrados**:
-- Proveedor
-- Cantidad de OC emitidas
-- Monto total
-- Promedio por OC
-- Tiempo promedio de confirmación
-- Estado de cada OC
-
-**Exportable a**: Excel, PDF
-
-#### 17.9.5. Reporte de Partes de Ingresos Pendientes
-
-**Objetivo**: Identificar partes de ingreso generados pero no recepcionados
-
-**Datos Mostrados**:
-- Código de Parte de Ingresos
-- Código de OC Asociado
-- Proveedor
-- Fecha de Generación
-- Días Pendiente
-- Monto
-- Estado
-
-**Acciones**:
-- Notificar a Logística
-- Marcar como recepcionado
-- Ver detalle
-
-### 17.10. Alertas del Sistema
-
-#### 17.10.1. Alerta: Nuevo Engagement Detectado
-- **Tipo**: Notificación automática
-- **Destinatario**: Service Desk FM
-- **Urgencia**: Normal
-- **Acción Requerida**: Cargar documentos obligatorios en 24 horas
-
-#### 17.10.2. Alerta: Documentos Incompletos
-- **Tipo**: Advertencia
-- **Destinatario**: Service Desk FM
-- **Urgencia**: Alta
-- **Acción Requerida**: Completar documentación de inmediato
-
-#### 17.10.3. Alerta: Aprobación Pendiente
-- **Tipo**: Recordatorio
-- **Destinatario**: Aprobador correspondiente
-- **Frecuencia**: Diaria hasta que se apruebe
-- **Acción Requerida**: Revisar y aprobar/rechazar
-
-#### 17.10.4. Alerta: Tiempo de Aprobación Excedido
-- **Tipo**: Escalamiento
-- **Destinatario**: Superior del aprobador + Gerente FM
-- **Trigger**: Se excedió tiempo máximo de aprobación
-- **Acción Requerida**: Intervención inmediata
-
-#### 17.10.5. Alerta: OC Generada
-- **Tipo**: Información
-- **Destinatario**: FM, Service Desk
-- **Urgencia**: Normal
-- **Acción Requerida**: Revisar OC generada
-
-#### 17.10.6. Alerta: Proveedor No Confirmó OC
-- **Tipo**: Advertencia
-- **Destinatario**: FM
-- **Trigger**: 24 horas sin confirmación de proveedor
-- **Acción Requerida**: Contactar al proveedor
-
-#### 17.10.7. Alerta: Parte de Ingresos Pendiente
-- **Tipo**: Recordatorio
-- **Destinatario**: Logística/Almacén, FM
-- **Frecuencia**: Cada 3 días
-- **Acción Requerida**: Recepcionar productos/servicios
-
-### 17.11. Validaciones Adicionales
-
-1. **Código de Engagement**:
-   - Debe existir en sistema SQLPED
-   - Debe estar activo
-   - No debe estar asociado a otra solicitud
-   - Antigüedad máxima: 90 días
-
-2. **Sustento de Ingresos y Gastos**:
-   - Formato PDF o Excel
-   - Tamaño máximo: 5 MB
-   - Fecha de elaboración no mayor a 30 días
-   - Monto debe coincidir con engagement (±2% tolerancia)
-
-3. **Cotización Aprobada**:
-   - Debe estar en estado "Aprobada"
-   - Debe contener firmas de cliente y proveedor
-   - Formato PDF
-   - Tamaño máximo: 10 MB
-   - Vigencia no vencida
-
-4. **OC Generada por Compras**:
-   - Código único (no duplicado)
-   - Formato PDF obligatorio
-   - Monto debe coincidir con aprobado (±2% tolerancia)
-   - Debe contener sello/firma de Compras
-   - Tamaño máximo: 10 MB
-
-5. **Confirmación de Proveedor**:
-   - Debe realizarse dentro de 48 horas
-   - Usuario del proveedor debe estar registrado
-   - Aceptación de términos obligatoria
-
-### 17.12. Consideraciones Técnicas
-
-1. **Almacenamiento de Documentos**:
-   - Repositorio seguro con backup automático
-   - Versionado de documentos
-   - Retención mínima: 7 años
-   - Encriptación de archivos sensibles
-
-2. **Seguridad**:
-   - Autenticación de usuarios por rol
-   - Control de acceso granular
-   - Registro de todos los accesos
-   - Auditoría completa de acciones
-
-3. **Performance**:
-   - Carga de documentos: máximo 30 segundos
-   - Consulta de estado: tiempo de respuesta < 2 segundos
-   - Generación de reportes: máximo 1 minuto
-   - Notificaciones en tiempo real (< 5 segundos)
-
-4. **Disponibilidad**:
-   - Sistema disponible 24/7
-   - Mantenimientos programados fuera de horario laboral
-   - Notificación previa de mantenimientos (48 horas)
-   - Plan de contingencia ante caídas
-
-5. **Integraciones**:
-   - Monitoreo de conexión con SQLPED cada 5 minutos
-   - Reintentos automáticos en caso de fallo (3 intentos)
-   - Alertas a TI si integración falla
-   - Modo manual disponible si API no funciona
 
 ## 18. EJECUCIÓN DE TRABAJO / ENTREGA DEL BIEN
 
@@ -6160,12 +5265,12 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 
 | N° | DOCUMENTO | REVISIÓN | TRABAJOS MENORES | ALTO RIESGO | EMERGENCIA |
 |----|-----------|----------|------------------|-------------|------------|
-| 1 | Relación de Personal | CONTRALOR | ✓ | ✓ | ✓ |
-| 2 | Certificado de Homologación | CONTRALOR | ✓ | ✓ | ✓ |
-| 3 | Constancia SCTR (Salud y Pensión) | CONTRALOR | ✓ | ✓ | ✓ |
+| 1 | Relación de Personal | SST | ✓ | ✓ | ✓ |
+| 2 | Certificado de Homologación | SST | ✓ | ✓ | ✓ |
+| 3 | Constancia SCTR (Salud y Pensión) | SST | ✓ | ✓ | ✓ |
 | 4 | Certificado de Operatividad de Equipos | SST | - | ✓ | ✓ |
 | 5 | Procedimiento de Trabajo Seguro | SST | - | ✓ | ✓ |
-| 6 | Carnet SST Terceros | CONTRALOR | ✓ | ✓ | ✓ |
+| 6 | Carnet SST Terceros | SST | ✓ | ✓ | ✓ |
 | 7 | CV Documento de Prevencionista de Riesgo | SST | - | ✓ | ✓ |
 | 8 | Certificado de Aptitud Médico | SST | - | ✓ | - |
 | 9 | Certificado de Capacitación Trabajo Alto Riesgo | SST | - | ✓ | - |
@@ -6176,7 +5281,7 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 | 14 | Hojas de Seguridad - MSDS | SST | ✓ | ✓ | ✓ |
 | 15 | Carta de Autorización de Corte de Energía | SST | - | ✓ | ✓ |
 
-**Leyenda**: ✓ Obligatorio | - No requerido | CONTRALOR: Revisión Contraloría | SST: Revisión Seguridad y Salud
+**Leyenda**: ✓ Obligatorio | - No requerido | SST: Revisión Contraloría | SST: Revisión Seguridad y Salud
 
 **Total documentos obligatorios**: Menores (7), Alto Riesgo (15), Emergencia (11)
 
@@ -6186,15 +5291,15 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 2. Carga cada documento (formato PDF, máximo 10 MB)
 3. Sistema valida formato, tamaño y vigencia (si aplica)
 4. Sistema muestra progreso: "X de Y documentos cargados"
-5. Proveedor confirma envío → Sistema notifica a Supervisor y SSDMA
+5. Proveedor confirma envío → Sistema notifica a Supervisor y SSOMA
 
-#### 18.2.4. Supervisor y SSDMA Validan Documentación
+#### 18.2.4. Supervisor y SSOMA Validan Documentación
 
 1. **Supervisor revisa documentación**: Verifica completitud y vigencia
-2. **SSDMA valida documentos SST**: Checklist de seguridad (charla, personal autorizado, EPPs, permisos especiales)
+2. **SSOMA valida documentos SST**: Checklist de seguridad (charla, personal autorizado, EPPs, permisos especiales)
 3. **Gateway de Decisión: ¿Es correcto?**
    - **SÍ**: Supervisor confirma fecha de inicio → Estado: "Fecha de Inicio Confirmada"
-   - **NO**: SSDMA registra observaciones (Crítica/Media/Leve) → Proveedor debe subsanar
+   - **NO**: SSOMA registra observaciones (Crítica/Media/Leve) → Proveedor debe subsanar
 
 **Observaciones Críticas**: Bloquean inicio del servicio hasta subsanación
 
@@ -6202,9 +5307,9 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 
 1. **Inicio de ejecución**: Sistema registra fecha/hora de inicio y activa contador de 48 horas
 2. **Alertas progresivas de cierre**:
-   - A las 24 horas: Primera alerta al Supervisor
+   - A las 24 horas: Primera alerta al Supervisor, FM
    - A las 40 horas: Alerta de urgencia
-   - A las 48 horas: Alerta crítica al Supervisor y Gerente FM
+   - A las 48 horas: Alerta crítica al Supervisor, FM y Gerente FM
 
 #### 18.2.6. Cierre del Servicio
 
@@ -6214,7 +5319,7 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
    - Evidencias fotográficas (mínimo 3)
    - Documentación geolocalizable (si aplica)
    - Certificados de Prueba/Garantía (si aplica)
-2. **Supervisor valida documentación de cierre**: Revisa acta, valida alcance, aprueba o solicita correcciones
+2. **Supervisor, FM valida documentación de cierre**: Revisa acta, valida alcance, aprueba o solicita correcciones
 3. **Sistema cierra el ticket**: Estado final "Cerrado", genera reporte, archiva documentación
 
 ---
@@ -6226,12 +5331,12 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 1. Service Desk coordina fecha de entrega con proveedor
 2. Proveedor envía información para ingreso (guía de remisión, factura, certificados)
 3. Service Desk valida documentación de ingreso
-4. **Gateway: ¿Es correcto?**
-   - **SÍ**: Service Desk genera PI (Parte de Ingreso) y lo envía al almacén
+4. **¿Es correcto?**
+   - **SÍ**: Service Desk solicita PI (Parte de Ingreso) una vez que cuente con el PI lo envía al almacén
    - **NO**: Proveedor debe corregir documentación
 5. Almacén recepciona bien con PI
 
-#### 18.3.2. Vía Puesta a Calle (CC - Centro de Costo/Cliente)
+#### 18.3.2. Vía Puerta Calle (CC - Centro comercial/Cliente)
 
 1. Supervisor coordina fecha de ejecución con cliente
 2. Proveedor ejecuta servicio (instalación/puesta en marcha)
@@ -6260,12 +5365,12 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 - Validación: Solo PDF, tamaño máximo, fechas vigentes
 - Botones: Cargar Documento, Enviar Documentación Completa
 
-#### 18.5.3. Pantalla de Gestión de Documentos (Supervisor/SSDMA)
+#### 18.5.3. Pantalla de Gestión de Documentos (Supervisor/SSOMA)
 - Tabla: N°, Documento, Responsable Revisión, Estado (Pendiente/Cargado/Aprobado/Observado), Fecha Carga, Vencimiento, Acciones
 - Filtros: Por Estado, Por Responsable (CONTRALOR/SST)
 - Botones: Aprobar Todos, Enviar Observaciones
 
-#### 18.5.4. Pantalla de Revisión SSDMA
+#### 18.5.4. Pantalla de Revisión SSOMA
 - Checklist SST: Charla Seguridad, Personal Autorizado, EPPs Verificados, Permisos Especiales, Documentación Vigente
 - Observaciones: Tipo (Crítica/Media/Leve), Descripción, Documentos Afectados, Acción Correctiva, Plazo, Evidencia Fotográfica
 - Botones: Aprobar Documentación SST, Registrar Observación, Rechazar
@@ -6296,23 +5401,10 @@ Gestionar la ejecución de trabajos y entrega de bienes, desde la coordinación 
 3. **Observaciones Críticas**: Bloquean inicio; Medias permiten inicio con compromiso; Leves se subsanan durante ejecución
 4. **Alerta 48 Horas**: Contador automático desde inicio; alertas a las 24, 40 y 48 horas; exceder plazo requiere justificación escrita
 5. **Conformidad Cliente**: Acta firmada por cliente es obligatoria para cerrar servicio; sin conformidad NO se puede cerrar
-6. **Parte de Ingreso (PI)**: Obligatorio para recepción de bienes; debe estar vinculado a OC; sin PI almacén NO recepciona
 
----
-
-### 18.7. Consideraciones Técnicas
-
-- **Almacenamiento**: Repositorio seguro, backup diario, versionado de documentos, retención 7 años, encriptación de docs sensibles
-- **Seguridad**: Acceso por roles (Supervisor, SSDMA, Proveedor, Almacén), permisos granulares, registro de accesos, auditoría completa
-- **Performance**: Carga docs < 30 seg, visualización < 3 seg, generación PI < 5 seg, consulta estado < 2 seg
-- **Disponibilidad**: Sistema 24/7 (especialmente emergencias), mantenimientos fuera de horario laboral, notificación previa 48 horas
-- **Notificaciones**: Envío en tiempo real (< 5 seg), múltiples canales (email, sistema, WhatsApp para urgentes), reintentos automáticos (3 intentos)
-
----
 
 **Nota Final**: El módulo de Ejecución de Trabajo/Entrega del Bien es crítico para controlar la documentación obligatoria de seguridad según el tipo de trabajo (15 documentos para Alto Riesgo, 11 para Emergencia, 7 para Trabajos Menores), garantizar cumplimiento de plazos de cierre (48 horas) y asegurar la trazabilidad completa desde coordinación hasta cierre final.
 
----
 
 ## 19. EMISIÓN DE HES (Hoja de Entrada de Servicio)
 
@@ -6334,16 +5426,16 @@ Gestionar la emisión de HES (Hoja de Entrada de Servicio) para formalizar la cu
 
 | N° | Documento | Formato | Obligatorio |
 |----|-----------|---------|-------------|
-| 1 | Ficha de Atención | PDF | Sí |
+| 1 | Ficha de Atención ó Acta de Conformidad | PDF | Sí |
 | 2 | Informe Técnico | PDF | Sí |
-| 3 | Protocolo de Mantenimiento | PDF | Condicional* |
-| 4 | Acta de Conformidad | PDF | Sí |
-| 5 | Evidencias Fotográficas | JPG/PNG/PDF | Sí |
-| 6 | Orden de Trabajo Cerrada | PDF | Sí |
-| 7 | Reporte de Materiales Utilizados | PDF/Excel | Condicional* |
-| 8 | Certificados de Prueba | PDF | Condicional* |
+| 3 | Protocolo de Mantenimiento | PDF | Opcional* |
+| 4 | Evidencias Fotográficas | JPG/PNG/PDF | Sí |
+| 5 | Orden de Trabajo Cerrada | PDF | Sí |
+| 6 | Reporte de Materiales Utilizados | PDF/Excel | Opcional* |
+| 7 | Certificados de Prueba | PDF | Opcional* |
+| 8 | Carta de garantía | PDF | Opcional* |
 
-*Condicional: Según tipo de servicio (preventivo/correctivo, uso de materiales, alto riesgo)
+*Opcional: Según tipo de servicio (preventivo/correctivo, uso de materiales, alto riesgo)
 
 **Validaciones**: Formato PDF, tamaño máximo 10 MB, nomenclatura con código de servicio
 
@@ -6355,15 +5447,14 @@ Gestionar la emisión de HES (Hoja de Entrada de Servicio) para formalizar la cu
 4. Sistema genera número de solicitud y cambia estado a "Solicitud de HES en Revisión"
 5. Sistema notifica al Service Desk
 
-#### 19.2.3. Service Desk Valida la Documentación
+#### 19.2.3. Supervisor o FM Valida la Documentación
 
-1. Service Desk accede al módulo de Validación de HES (filtros: Estado, Proveedor, Fecha, Cliente)
+1. Supervisor o FM accede al módulo de Validación de HES (filtros: Estado, Proveedor, Fecha, Cliente)
 2. Selecciona solicitud y accede a documentación cargada
 3. Revisa cada documento con checklist:
-   - Ficha de Atención completa y firmada
+   - Ficha de Atención o Acta de Conformidad  completa y firmada
    - Informe Técnico detallado con hallazgos
    - Protocolo de Mantenimiento (si aplica)
-   - Acta de Conformidad con firma del cliente
    - Evidencias fotográficas claras (mínimo 3: antes, durante, después)
    - Orden de Trabajo cerrada
    - Reporte de Materiales coincide con OC (si aplica)
@@ -6390,16 +5481,8 @@ Gestionar la emisión de HES (Hoja de Entrada de Servicio) para formalizar la cu
 
 #### 19.2.5. Service Desk Emite la HES
 
-1. Service Desk accede a módulo de Emisión de HES
-2. Sistema pre-llena datos automáticamente:
-   - Número de HES (formato: HES-[Año]-[Mes]-[Correlativo])
-   - Código de Servicio, OC, Proveedor, Cliente, Sede
-   - Descripción, Fechas, Monto Total
-3. Service Desk completa información adicional (opcional):
-   - Observaciones, Área Solicitante, Centro de Costo, N° de PI, Anexos
-4. Genera HES en PDF (plantilla estándar con logo Panorama BPO)
-5. Revisa vista previa y confirma
-6. Hace clic en "Emitir HES" → Estado: "HES Emitida"
+1. Service Desk accede a módulo de Emisión de HES - en SAP
+
 
 #### 19.2.6. Service Desk Carga la HES al Sistema
 
@@ -6408,77 +5491,28 @@ Gestionar la emisión de HES (Hoja de Entrada de Servicio) para formalizar la cu
 3. Actualiza estado: "HES Emitida y Registrada"
 4. Marca servicio como "Listo para Facturación"
 
-#### 19.2.7. Sistema Envía la HES vía Mail al Proveedor
+#### 19.2.7. Sistema Envía la HES vía Mail al Proveedor y adjunta dentro de la solicitud
 
 1. Sistema genera correo automático con:
    - Asunto: "HES Emitida - [Número] - [Código Servicio]"
    - Datos de HES (número, servicio, OC, cliente, monto)
    - HES adjunta en PDF
    - Instrucciones: Facturar en 5 días hábiles con referencia a HES y OC
-2. Registra envío (fecha, hora, destinatario, estado)
-3. Notifica a Supervisor de MTTO y Gerente FM (si monto > umbral)
-4. Estado final: "Proceso de HES Completado"
+2. Adjunta el archivo PDF dentro de la solicitud del proveedor
 
----
 
 ### 19.3. Estados de la Solicitud de HES
 
-1. **Pendiente de Solicitud** | 2. **Documentación en Carga** | 3. **Solicitud en Revisión** | 4. **Documentación Observada** | 5. **Solicitud en Revisión (Corrección)** | 6. **Documentación Aprobada** | 7. **HES en Emisión** | 8. **HES Emitida** | 9. **HES Emitida y Registrada** | 10. **HES Enviada al Proveedor** | 11. **Proceso Completado** | 12. **Suspendida**
+1. **Pendiente de Solicitud** |
+2. **Documentación en Carga** |
+3. **Solicitud en Revisión** |
+4. **Documentación Observada** | 
+5. **Solicitud en Revisión (Corrección)** |
+6. **Documentación Aprobada** | 
+7. **HES Emitida** |
+9. **Suspendida**
+10. **Anulada**
 
----
-
-### 19.4. Pantallas del Módulo
-
-#### 19.4.1. Portal de Proveedores - Solicitud de HES
-- Lista de servicios completados (filtros: Estado HES, Cliente, Fechas, Monto)
-- Formulario de solicitud: Datos servicio (solo lectura), Carga de documentos, Barra de progreso, Observaciones
-- Botones: Cargar Documento, Guardar Borrador, Solicitar Emisión de HES
-
-#### 19.4.2. Pantalla de Validación de HES (Service Desk)
-- Información del servicio (código, proveedor, cliente, fecha, monto)
-- Checklist de documentos (estado, ver/descargar, observaciones)
-- Botones: Aprobar Documento, Observar Documento, Aprobar Todos, Solicitar Correcciones, Emitir HES
-
-#### 19.4.3. Pantalla de Emisión de HES
-- Datos pre-llenados (automáticos)
-- Campos editables (observaciones, área, centro costo, PI, anexos)
-- Vista previa de HES en PDF
-- Botones: Generar Vista Previa, Emitir HES, Cancelar, Guardar Borrador
-
-#### 19.4.4. Pantalla de Seguimiento de HES
-- Filtros: Estado, Proveedor, Cliente, Fechas, Número HES
-- Tabla: Número HES, Código Servicio, Proveedor, Cliente, Fecha Emisión, Monto, Estado, Días desde Emisión
-- Acciones: Ver Detalle, Descargar PDF, Ver Documentación, Reenviar, Auditoría, Imprimir, Exportar Excel
-
----
-
-### 19.5. Reglas de Negocio
-
-1. **Documentación Obligatoria**: Sistema NO permite solicitar HES sin documentos obligatorios completos (5 siempre + 3 condicionales)
-2. **Acta de Conformidad**: Debe tener firma cliente; sin acta NO se puede emitir HES
-3. **Límite de Rechazos**: Máximo 3 oportunidades para corregir; después se suspende automáticamente
-4. **Plazos**: Corrección en 2 días hábiles (ampliable a 5 máximo); recordatorio 1 día antes; vencimiento suspende solicitud
-5. **Numeración HES**: Formato HES-[Año]-[Mes]-[Correlativo]; secuencial y única; no modificable una vez emitida
-6. **Facturación**: Proveedor debe facturar en 5 días hábiles; recordatorio a los 3 días; referencia obligatoria a HES y OC
-7. **Modificación HES**: Una vez emitida es inmutable; anulación requiere aprobación Gerente FM
-8. **Vinculación OC**: HES debe estar vinculada a OC válida; monto no puede exceder OC (±2% tolerancia)
-
----
-
-### 19.6. Consideraciones Técnicas
-
-- **Almacenamiento**: Repositorio seguro, backup diario, formato PDF/A, retención 7 años, indexación por HES/OC/servicio/proveedor
-- **Seguridad**: HES inmutables, solo lectura proveedores, control acceso por rol, auditoría completa
-- **Performance**: Generación PDF < 10 seg, consulta < 2 seg, descarga < 5 seg, envío email < 30 seg
-- **Sin SAP**: No hay integración; gestión exclusiva en FM; exportación manual a Excel si necesario
-- **Trazabilidad**: Vinculación completa Solicitud → Cotización → OC → Ejecución → Cierre → HES
-
----
-
-**Nota Final**: El módulo de Emisión de HES es crítico para el cierre administrativo de servicios. La correcta validación de documentación y emisión oportuna asegura el flujo de facturación y pago a proveedores. El sistema garantiza la inmutabilidad de las HES emitidas y mantiene una auditoría completa del proceso.
-
-
----
 
 ## 20. PRESENTACIÓN DE KPI's
 
@@ -6502,6 +5536,8 @@ Proporcionar visualización y análisis de indicadores clave de rendimiento (KPI
 
 - **CASO A - KPI Estándar**: Usuario selecciona KPI de la lista de 23 predefinidos → Sistema permite visualizar reportes estándares
 - **CASO B - Nuevo KPI**: Usuario crea dashboard personalizado → Sistema permite crear y sugerir reportes personalizados (Estilo Power BI + IA)
+
+**Nota: Alternativa usar para generar https://www.thebricks.com **
 
 #### 20.2.3. Sistema Permite Visualizar Reportes Estándares
 
