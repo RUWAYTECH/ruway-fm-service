@@ -5696,6 +5696,8 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
 
 3. **Sistema valida información**: Disponibilidad de recursos, conflictos de calendario, capacidad del personal
 
+4. **La programación de preventivo**, debe permitir cargar de forma masiva (considar bajo un formato excel)
+
 **Nota**: Modificable por Gerente de FM y FM
 
 #### 21.2.3. Sistema Agrupa y Calendariza
