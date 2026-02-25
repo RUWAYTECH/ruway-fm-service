@@ -5738,6 +5738,7 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
 
 **Generación Automática**:
 
+0. **Ingresar el nro de Ticket** la relación entre la OT y ticket es de uno a uno.
 1. **Código único PAM**: Formato PAM-[Año]-[Mes]-[Cliente]-[Correlativo] (ej: PAM-2026-02-CLIENTEX-001)
 
 2. **Datos obligatorios de la OT**:
@@ -5746,7 +5747,7 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
    - **Clasificación**: Tipo (Preventivo/Correctivo), Criticidad (Normal default/Urgente/Emergencia)
    - **Asignaciones**: Cliente, Sede/Inmueble, Proveedor, Técnico
    - **Programación**: Fecha inicio calendarizada, duración estimada
-   - **Estado inicial**: "Programada" (Estados: Operativo, En Proceso, Programada, Ejecutada, Con Atraso, Anulada)
+   - **Estado inicial**: "Programada" (Estados: En Proceso, Programada, Reprogramada, Ejecutada, Con Atraso, Anulada)
 
 3. **Módulo de Gestión de OT's**:
    - **Visualización**: Modo Kanban (columnas por estado) o Modo Listado (tabla 100% de OT's)
@@ -5823,7 +5824,7 @@ Sistema actualiza automáticamente el color en calendario según estado.
 - Sede (múltiple selección)
 - Tipo de Actividad (múltiple selección)
 - Técnico Asignado (múltiple selección)
-- Estado (Programada, En Ejecución, Cerrado, Culminado)
+- Estado (En Proceso, Programada, Reprogramada, Ejecutada, Con Atraso, Anulada)
 
 **Código de Colores**:
 - 🟦 Azul: Preventivo
@@ -5944,30 +5945,30 @@ Contenido del mensaje: Nro OT, Cambio de estado, Proveedor, Tipo de mantenimient
 
 1. **Generación de Códigos PAM**: Automática y secuencial; formato PAM-[Año]-[Mes]-[Cliente]-[Correlativo]; único e irrepetible
 2. **Modificación de Programación**: Solo Gerente de FM y FM pueden crear/modificar; Técnicos solo pueden cerrar/ejecutar
-3. **Conflictos de Calendario**: Sistema alerta si técnico tiene 2+ actividades en mismo turno/día; permite override con justificación
+3. **Conflictos de Calendario**: Sistema restringe que a la misma hora un servicio no puede ser programado
 4. **Recurrencia Automática**: Sistema genera automáticamente próximas ocurrencias según frecuencia (mensual, trimestral, etc.) hasta 12 meses adelante
 5. **Fecha de Inicio**: Debe ser = Día de ejecución programado en calendario; modificable hasta 24 horas antes
-6. **Reprogramación**: Máximo 3 reprogramaciones por actividad; más requiere aprobación Gerente FM; debe registrarse motivo
-7. **Cierre Obligatorio**: Actividades en estado "En Ejecución" deben cerrarse en 48 horas; alerta automática a Supervisor
+6. **Reprogramación**: Máximo 2 reprogramaciones por actividad; más requiere aprobación Gerente y FM; debe registrarse motivo
+7. **Cierre Obligatorio**: Actividades en estado "En Ejecución" deben cerrarse en 72 horas; alerta automática a Supervisor por WhatsApp
 8. **Validación de Recursos**: Sistema valida disponibilidad de recursos al programar; bloquea recursos asignados
-9. **Estados de OT**: 6 estados posibles (Operativo, En Proceso, Programada, Ejecutada, Con Atraso, Anulada); transiciones controladas
+9. **Estados de OT**: 6 estados posibles (En Proceso, Programada, Reprogramada, Ejecutada, Con Atraso, Anulada); transiciones controladas
 10. **Criticidad por Default**: Nueva OT se crea con criticidad "Normal"; Urgente/Emergencia debe indicarse explícitamente
 11. **Incidencias Asociadas**: Si OT proviene de incidencia, hereda el concepto automáticamente; asociación inmutable
 12. **Firma Digital Obligatoria**: OT no puede cerrarse sin firma digital del responsable; firma registra usuario, fecha y hora
 13. **Cálculo de Tiempos**: Sistema calcula automáticamente tiempo de atención desde fecha programada; marca como "Atrasada" si excede plazo
-14. **Alertas Multicanal**: Usuario elige canal preferido (correo/SMS/WhatsApp); alertas se envían según configuración personal
+14. **Alertas**: Las alertas se envían mediante WhatsApp
 15. **Grupos MTTO**: Grupo y Sub Grupo MTTO son obligatorios; deben existir en catálogo maestro; lista desplegable con búsqueda
 
 ---
 
 ### 21.5. Consideraciones Técnicas
 
-- **Almacenamiento**: Calendario con retención 24 meses; tareas programadas archivadas 7 años; backup diario
+- **Almacenamiento**: Backup diario
 - **Seguridad**: Acceso por rol (Gerente FM: full, FM: crear/editar, Técnico: ejecutar/cerrar, Supervisor: validar); auditoría completa
 - **Performance**: Carga calendario < 2 seg; generación Gantt < 3 seg; filtros en tiempo real < 1 seg
-- **Sincronización**: Calendario se actualiza cada 5 minutos; notificaciones en tiempo real; sincronización con calendarios externos (Outlook, Google Calendar) opcional
-- **Notificaciones**: Recordatorios 24h antes de mantenimiento; alertas de conflictos; notificación de cierre pendiente; resumen semanal de programación
-- **Escalabilidad**: Soportar hasta 10,000 actividades programadas simultáneamente; 200 técnicos activos; múltiples clientes y sedes
+- **Sincronización**: Calendario se actualiza cada 5 minutos; notificaciones en tiempo real; sincronización con calendarios externos (Outlook) requerido.
+
+- **Notificaciones**: Recordatorios 24h antes de mantenimiento; resumen semanal de programación al Supervisor FM, los técnicos.
 
 ---
 
