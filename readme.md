@@ -5673,6 +5673,8 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
 #### 21.2.2. FM Registra Programación y Actividades
 
 1. **FM completa información**:
+
+   - Ingresar el nro de Ticket; la relación entre la OT y ticket es de uno a uno.
    - Tipo de Actividad (Preventivo, Inspección, Calibración, Limpieza, etc.)
    - Cliente/Sede
    - Equipo/Activo (si aplica)
@@ -5682,6 +5684,7 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
    - Recursos Necesarios (herramientas, materiales)
    - Personal Asignado (técnico, proveedor)
    - Observaciones
+   
 
 2. **Sistema recoge información del Event Code**:
    - Fecha programada
@@ -5725,6 +5728,7 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
 - Visualización de dependencias
 - Hitos importantes
 - Progreso de ejecución
+- Tomar de referencia el diseño de project
 
 **Gateway de Decisión: Calendario o Gantt?**
 - Usuario selecciona vista preferida
@@ -5753,6 +5757,9 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
    - **Validación**: Firma digital requerida para cierre
    - **Exportación**: Imprimible y exportable a PDF
 
+![Formato de OT](assets/formato-ot.png)
+
+
 4. **Fecha de inicio = Día de ejecución programado**
 
 #### 21.2.6. Gestión de Cierre de Mantenimiento
@@ -5761,7 +5768,7 @@ Gestionar la programación de mantenimientos preventivos y actividades de FM med
    - Fecha y hora real de ejecución
    - Actividades realizadas
    - Hallazgos/Observaciones
-   - Materiales utilizados
+   - Materiales utilizados (Opcional)
    - Evidencias fotográficas
 
 2. **Supervisor valida cierre**:
@@ -5838,8 +5845,7 @@ Sistema actualiza automáticamente el color en calendario según estado.
 - Indicador de progreso (% completado)
 
 **Interactividad**:
-- Arrastrar barras para reprogramar
-- Zoom in/out en timeline
+- Zoom in/out en timeline 
 - Filtros dinámicos
 - Export a PDF/imagen
 
@@ -5884,7 +5890,11 @@ Sistema actualiza automáticamente el color en calendario según estado.
 
 **Búsqueda Global**: Por cualquier campo, autocompletado, búsqueda inteligente
 
-**Alertas Personalizadas**: Usuario configura alertas por fecha programación, cambio de estado, asignaciones, atrasos; canal: correo/SMS/WhatsApp
+**Alertas Personalizadas**: Usuario configura alertas por fecha programación, cambio de estado, asignaciones, atrasos; canal: WhatsApp
+
+Contenido del mensaje: Nro OT, Cambio de estado, Proveedor, Tipo de mantenimiento, Fechas.
+
+
 
 **Botones**: Crear OT Manual, Cambiar Vista (Kanban/Listado), Exportar Todo, Configurar Alertas
 
