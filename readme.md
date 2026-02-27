@@ -6194,3 +6194,12 @@ El sistema procesa la solicitud de descarga, consolida la información seleccion
 5. **Reporte comparativo de KPI's**: El sistema genera automáticamente el comparativo de evolución de KPI's respecto al período anterior.
 6. **Descarga trazable**: Toda descarga queda registrada en el sistema con usuario, fecha, hora y tipo de reporte generado.
 7. **Filtros persistentes**: Los filtros aplicados por el usuario se mantienen activos durante la sesión.
+
+## 22.2.4. Consideraciones Técnicas
+El aplicativo móvil será desarrollado en React Native, framework multiplataforma que permite mantener una única base de código fuente compatible con los dos principales sistemas operativos móviles:
+
+iOS: a partir de la versión iOS 14 en adelante.
+Android: a partir de la versión Android 10 en adelante.
+
+Este enfoque garantiza consistencia funcional y visual en ambas plataformas, cubriendo la mayor parte del parque de dispositivos móviles disponibles en el mercado, y reduciendo tiempos y costos de desarrollo y mantenimiento frente a desarrollos nativos independientes.
+El aplicativo será distribuido a través de los canales oficiales de cada plataforma: App Store (iOS) y Google Play Store (Android).
