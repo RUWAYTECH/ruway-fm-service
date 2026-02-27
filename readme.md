@@ -5976,3 +5976,221 @@ Contenido del mensaje: Nro OT, Cambio de estado, Proveedor, Tipo de mantenimient
 
 **Nota Final**: El módulo de Programación de Mantenimiento y Actividades centraliza la planificación de mantenimientos preventivos mediante calendario visual y Gantt, generando automáticamente códigos PAM únicos y OT's asociadas, asegurando control completo desde programación hasta cierre con trazabilidad total.
 
+# 22. FUNCIONALIDAD DE APLICACIÓN MÓVIL
+
+## 22.1. Módulo para Usuario Administrativo
+
+Se plantea en el frente administrativo las características que tendrá el aplicativo, con el fin de suplir las siguientes necesidades:
+
+- Poder gestionar tareas, actividades y envío de documentación y reportes a los destinatarios definidos en el flujograma.
+- Garantizar la correcta adecuación de las actividades realizadas por el equipo de FM, a fin de integrar la información necesaria capaz de ser administrada por el personal asignado (declaración de actividades y su cumplimiento, aprobaciones y comunicaciones internas para agilizar la operación).
+
+---
+
+### 22.1.1. Upload y Revisión de Archivos
+
+El usuario administrativo podrá cargar documentos directamente desde el aplicativo móvil, asociándolos a la actividad, OT o registro correspondiente. Los tipos de documentos habilitados para carga son:
+
+- Acta de Conformidad
+- Información de Activos
+- Orden de Trabajo (OT)
+- Informe Técnico
+- Certificado de Operatividad
+- Protocolo de Pruebas
+
+**Características funcionales**:
+
+- El sistema permite adjuntar archivos en formatos PDF, JPG y PNG.
+- Cada documento cargado queda asociado al registro origen (OT, actividad, activo o PAM) de forma trazable.
+- El usuario puede visualizar, revisar y descargar los archivos adjuntos desde el mismo aplicativo.
+- El sistema registra automáticamente el usuario que realizó la carga, la fecha y hora del evento.
+- Se habilitará un visor de documentos integrado en el aplicativo para revisión sin necesidad de salir de la plataforma.
+
+**Reglas**:
+
+- Solo usuarios con rol administrativo, FM o Supervisor podrán cargar documentos.
+- Los archivos quedan bloqueados para edición una vez aprobados; solo se podrá adjuntar una nueva versión.
+
+---
+
+### 22.1.2. Registro de Actividades
+
+El usuario registra las actividades ejecutadas en campo, permitiendo declarar el cumplimiento de las tareas programadas asociadas al PAM.
+
+**Características funcionales**:
+
+- El sistema presenta al usuario una lista de actividades asignadas para el día, vinculadas al PAM correspondiente.
+- Cada actividad contiene un **checklist de tareas (TO DO)** que el usuario debe marcar como completadas al momento de la ejecución.
+- El usuario puede registrar observaciones, hallazgos y evidencias fotográficas por cada actividad.
+- El sistema permite indicar el estado de cumplimiento de cada tarea: Completada, Pendiente o Con Observación.
+- Una vez marcadas todas las tareas del checklist, el sistema habilita la opción de declarar la actividad como **Ejecutada**.
+- El registro queda asociado automáticamente a la OT y al código PAM correspondiente, asegurando trazabilidad completa.
+
+**Reglas**:
+
+- El marcado del checklist es obligatorio para poder declarar el cierre de la actividad.
+- Las observaciones son de registro libre; las evidencias fotográficas son obligatorias (mínimo 2 fotos: antes y después).
+- Solo el técnico o FM asignado puede registrar el cumplimiento de la actividad.
+
+---
+
+### 22.1.3. Sistema Notifica Modificaciones o Adjuntos
+
+Cada vez que se realice una acción dentro del aplicativo (carga de documento, registro de actividad, cambio de estado, marcado de checklist, entre otros), el sistema generará una notificación automática a los destinatarios definidos en el flujograma.
+
+**Características funcionales**:
+
+- La notificación es **trazable y detallada**, indicando: tipo de evento, documento o actividad involucrada, usuario que ejecutó la acción, fecha y hora.
+- Ejemplo: si se sube un Acta de Conformidad, el sistema notifica a los destinatarios correspondientes indicando el tipo de documento y el evento asociado.
+- Las notificaciones se envían vía **WhatsApp**, siendo el canal principal definido para el aplicativo.
+- Este mecanismo de notificación es **transversal** y se replica para todas las actividades y registros señalados en el aplicativo.
+
+**Contenido mínimo de la notificación**:
+
+- Tipo de evento (carga de documento, cambio de estado, registro de actividad, etc.)
+- Nombre y tipo de documento adjunto (si aplica)
+- OT o código PAM asociado
+- Usuario responsable de la acción
+- Fecha y hora del evento
+- Enlace directo al registro en el aplicativo
+
+**Reglas**:
+
+- Las notificaciones son automáticas e inmediatas al momento de ejecutar la acción.
+- Los destinatarios son configurables por rol y por tipo de evento.
+- El sistema mantiene un historial de notificaciones enviadas por registro.
+
+# 22.2. Módulo de Reportería
+
+## Objetivo
+
+Proveer al Gerente de FM una vista consolidada y personalizable de los indicadores de gestión, actividades pendientes y reportes operativos del equipo FM, permitiendo el seguimiento del desempeño, la toma de decisiones y la descarga de información relevante directamente desde el aplicativo móvil.
+
+---
+
+## Flujo del Proceso
+
+### 22.2.1. Usuario Ingresa al Aplicativo
+
+El Gerente FM accede al aplicativo móvil y el sistema presenta los indicadores y módulos disponibles según su rol. El sistema muestra únicamente la información y métricas configuradas previamente por el usuario, garantizando una vista personalizada y relevante.
+
+---
+
+### 22.2.2. Sistema Muestra los Indicadores Seleccionados por el Usuario
+
+El sistema presenta un panel de indicadores configurado por el Gerente FM. Desde este punto, el flujo se divide en tres vistas disponibles de manera simultánea:
+
+- **3.1 KPI's de Gestión FM**
+- **3.2 Actividades "To Do" para Seguimiento**
+- **3.3 Dashboard y Acceso a Archivos Informativos y Reportes de FM**
+
+El usuario puede navegar libremente entre estas vistas dentro del módulo.
+
+---
+
+### 22.2.3. Vistas Disponibles del Módulo
+
+#### 3.1. KPI's de Gestión FM
+
+El sistema presenta los indicadores clave de desempeño (KPI's) de la operación FM, permitiendo al Gerente monitorear el estado general de la gestión.
+
+**Indicadores contemplados**:
+
+- % de cumplimiento de mantenimientos preventivos (PAM)
+- % de OT's ejecutadas vs. programadas
+- % de OT's con atraso
+- Tiempo promedio de atención de OT's
+- % de actividades cerradas en plazo
+- Cantidad de incidencias abiertas / cerradas
+- Índice de cumplimiento por técnico / proveedor
+
+**Características funcionales**:
+
+- Los KPI's se muestran en formato visual (tarjetas, gráficos de barra, gráficos circulares o indicadores de semáforo).
+- El usuario puede seleccionar qué indicadores visualizar y en qué orden.
+- Los datos se actualizan en tiempo real desde el sistema.
+- Se incluye reporte comparativo de evolución de KPI's (variación respecto a período anterior).
+
+**Reglas**:
+
+- Solo el Gerente FM tiene acceso a esta vista.
+- Los KPI's son de solo lectura; no se permite modificación desde este módulo.
+
+---
+
+#### 3.2. Actividades "To Do" para Seguimiento
+
+El sistema presenta al Gerente FM una vista consolidada de todas las actividades pendientes, en ejecución o con atraso, permitiendo el seguimiento del cumplimiento del equipo.
+
+**Características funcionales**:
+
+- Lista de actividades agrupadas por estado: Pendiente, En Ejecución, Con Atraso, Ejecutada.
+- Cada actividad muestra: código PAM u OT asociada, técnico/proveedor asignado, fecha programada, estado actual y días de atraso (si aplica).
+- El Gerente FM puede visualizar el detalle de cada actividad sin modificarla.
+- Filtros disponibles: por fecha, por técnico, por cliente/sede, por estado, por tipo de actividad.
+- Indicador visual de semáforo por nivel de cumplimiento (verde / amarillo / rojo).
+
+**Reglas**:
+
+- La vista es de solo lectura para el Gerente FM desde el aplicativo móvil.
+- Las actividades se sincronizan automáticamente con el módulo 21 (Programación de Mantenimiento y Actividades).
+
+---
+
+#### 3.3. Dashboard y Acceso a Archivos Informativos y Reportes de FM
+
+El sistema presenta un dashboard consolidado con acceso a los reportes generados por el equipo FM, así como a los archivos informativos cargados en el sistema.
+
+**Características funcionales**:
+
+- Visualización de reportes operativos: informes técnicos, actas de conformidad, certificados de operatividad, protocolos de prueba.
+- Acceso a reportes comparativos de evolución de KPI's por período (mensual, trimestral, semestral).
+- El dashboard acoge los campos e información seleccionada por el usuario para una vista personalizada.
+- Visualización de gráficos de tendencia y evolución histórica de indicadores.
+- Acceso directo a los archivos cargados en el módulo 22.1.1 (Upload y Revisión de Archivos).
+
+**Reglas**:
+
+- El acceso a archivos es de solo lectura desde esta vista.
+- Los reportes comparativos de KPI's se generan automáticamente por el sistema según los períodos disponibles.
+
+---
+
+### 22.2.4. Usuario Descarga Información
+
+El Gerente FM puede descargar la información visualizada en cualquiera de las tres vistas del módulo.
+
+**Características funcionales**:
+
+- La descarga está disponible para: KPI's, listado de actividades To Do, reportes y archivos del dashboard.
+- El sistema acoge los campos e información seleccionada por el usuario al momento de generar la descarga.
+- Formato de descarga: **Markdown (.md)**.
+- El archivo descargado incluye el período consultado, los filtros aplicados y la fecha/hora de generación del reporte.
+
+**Reglas**:
+
+- Solo el Gerente FM puede realizar descargas desde este módulo.
+- La descarga refleja exactamente la información visualizada con los filtros activos al momento de ejecutar la acción.
+
+---
+
+### 22.2.5. Sistema Descarga y Elabora la Información
+
+El sistema procesa la solicitud de descarga, consolida la información seleccionada por el usuario y genera el archivo en formato `.md`, incluyendo:
+
+- Encabezado con datos del reporte (período, fecha de generación, usuario)
+- Indicadores o actividades según la vista seleccionada
+- Gráficos o tablas en formato compatible con Markdown
+- Pie de página con trazabilidad (sistema, versión, usuario que generó el reporte)
+
+---
+
+## Reglas de Negocio
+
+1. **Acceso por rol**: Solo el Gerente FM tiene acceso al módulo de reportería en el aplicativo móvil.
+2. **Personalización de indicadores**: El Gerente FM configura qué KPI's y vistas desea visualizar; esta configuración se guarda por usuario.
+3. **Solo lectura**: El módulo es exclusivamente de consulta y descarga; no permite modificar registros.
+4. **Sincronización de datos**: La información mostrada se sincroniza en tiempo real con el sistema central (módulos 21 y 22.1).
+5. **Reporte comparativo de KPI's**: El sistema genera automáticamente el comparativo de evolución de KPI's respecto al período anterior.
+6. **Descarga trazable**: Toda descarga queda registrada en el sistema con usuario, fecha, hora y tipo de reporte generado.
+7. **Filtros persistentes**: Los filtros aplicados por el usuario se mantienen activos durante la sesión.
